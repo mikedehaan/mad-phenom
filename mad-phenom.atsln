@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "mad-phenom", "mad-phenom\mad-phenom.cppproj", "{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Debug|AVR.ActiveCfg = Debug|AVR
+		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Debug|AVR.Build.0 = Debug|AVR
+		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Release|AVR.ActiveCfg = Release|AVR
+		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

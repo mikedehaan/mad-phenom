@@ -26,8 +26,6 @@ void pinOutput(int pinNumber, int state);
 int pinHasInput(int pinNumber);
 void initialize();
 void threeRoundBurst();
-void fullAuto();
-void singleShot();
 void togglePreset();
 
 

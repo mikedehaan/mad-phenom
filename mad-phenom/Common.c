@@ -110,6 +110,7 @@ void loadPreset() {
 	
 	// Cutting this in down since I think the tippmann default is for trigger pull and release.
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
+	PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
 	
 	// Default to full auto
@@ -120,20 +121,19 @@ void loadPreset() {
 	}
 
 	if (FIRING_MODE == 0) { // Full Auto
-		fireMethod = &fullAuto;
-		fireOnTriggerRelease = 0;
-		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
+		//fireMethod = &fullAuto;
+		//fireOnTriggerRelease = 0;
+		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	} else if (FIRING_MODE == 1) { // Three Round Burst
-		fireMethod = &threeRoundBurst;
-		fireOnTriggerRelease = 0;
-		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
+		//fireMethod = &threeRoundBurst;
+		//fireOnTriggerRelease = 0;
+		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	} else {
-		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-		fireMethod = &singleShot;
-		fireOnTriggerRelease = &singleShot;
+		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
+		//fireMethod = &singleShot;
+		//fireOnTriggerRelease = &singleShot;
 	}	
 }
-
 
 void initialize() {
 	EEPROM_BALLS_PER_SECOND[0] = EEPROM_BALLS_PER_SECOND_1;
@@ -154,33 +154,6 @@ void initialize() {
 	}
 
 	loadPreset();
-}
-
-
-void threeRoundBurst() {
-	for (int i = 0; i < BURST_SIZE; i++) {
-		pinOutput(6, HIGH);
-		delay_ms(DWELL);
-		pinOutput(6, LOW);
-		
-		// don't delay on the last round
-		if (i < (BURST_SIZE - 1)) {
-			delay_ms(ROUND_DELAY);
-		}
-	}
-}
-
-void fullAuto() {
-	while (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) {
-		singleShot();
-		delay_ms(ROUND_DELAY);
-	}
-}
-
-void singleShot() {
-	pinOutput(6, HIGH);
-	delay_ms(DWELL);
-	pinOutput(6, LOW);
 }
 
 void togglePreset(){

@@ -4,11 +4,13 @@
 #include <avr/eeprom.h>
 
 #define MAX_PRESETS 3
-
-// Pin Definitions
 #define TRIGGER_PIN_1 5
 #define TRIGGER_PIN_2 7
-#define SOLENOID_PIN 6
+#define PIN_LED_GREEN 11
+#define PIN_LED_RED 12
+#define PIN_LED_YELLOW 6
+#define PIN_SOLENOID 6
+#define PIN_PUSHBUTTON 3
 
 extern uint8_t CURRENT_PRESET;
 
@@ -38,14 +40,5 @@ extern uint8_t ROUND_DELAY; // delay between shots in ms
 extern uint8_t PULL_DEBOUNCE;  // Debounce in ms
 extern uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 extern uint8_t DWELL;
-
-struct Clock {
-	volatile unsigned int   millisecond;
-	volatile char        second;
-	volatile char        minute;
-	volatile char        hour;
-};
-
-uint32_t millis(const Clock &clock);
 
 #endif

@@ -2,7 +2,7 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #define F_CPU 8000000UL
-
+#include <util/delay.h>
 #include "Common.h"
 #include "Globals.h"
 
@@ -12,6 +12,12 @@
 
 void (*fireMethod)() = 0;
 void (*fireOnTriggerRelease)() = 0;
+
+void delay_ms( int ms ){
+	for (int i = 0; i < ms; i++) {
+		_delay_ms(1);
+	}
+}
 
 int getPinMask(int pinNumber) {
 	if (pinNumber == 2) {
@@ -85,14 +91,6 @@ int pinHasInput(int pinNumber) {
 	}
 }
 
-void pinToggle(int pinNumber) {
-	if (pinNumber >= 2 && pinNumber <= 5) {
-		PORTB ^= getPinMask(pinNumber);
-	} else if (pinNumber >= 6 && pinNumber <= 13) {
-		PORTA ^= getPinMask(pinNumber);
-	}
-}
-
 void loadPreset() {
 	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET]);
 	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET]);
@@ -113,7 +111,6 @@ void loadPreset() {
 	// Cutting this in down since I think the tippmann default is for trigger pull and release.
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
 	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
-	PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	
 	// Default to full auto
 	// 0 = full auto
@@ -122,7 +119,6 @@ void loadPreset() {
 		FIRING_MODE = 0;
 	}
 
-/*
 	if (FIRING_MODE == 0) { // Full Auto
 		fireMethod = &fullAuto;
 		fireOnTriggerRelease = 0;
@@ -135,9 +131,9 @@ void loadPreset() {
 		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 		fireMethod = &singleShot;
 		fireOnTriggerRelease = &singleShot;
-	}
-	*/	
+	}	
 }
+
 
 void initialize() {
 	EEPROM_BALLS_PER_SECOND[0] = EEPROM_BALLS_PER_SECOND_1;
@@ -157,5 +153,44 @@ void initialize() {
 		CURRENT_PRESET = 0;
 	}
 
+	loadPreset();
+}
+
+
+void threeRoundBurst() {
+	for (int i = 0; i < BURST_SIZE; i++) {
+		pinOutput(6, HIGH);
+		delay_ms(DWELL);
+		pinOutput(6, LOW);
+		
+		// don't delay on the last round
+		if (i < (BURST_SIZE - 1)) {
+			delay_ms(ROUND_DELAY);
+		}
+	}
+}
+
+void fullAuto() {
+	while (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) {
+		singleShot();
+		delay_ms(ROUND_DELAY);
+	}
+}
+
+void singleShot() {
+	pinOutput(6, HIGH);
+	delay_ms(DWELL);
+	pinOutput(6, LOW);
+}
+
+void togglePreset(){
+	if (CURRENT_PRESET >= (MAX_PRESETS - 1)) {
+		CURRENT_PRESET = 0;
+	} else {
+		CURRENT_PRESET++;
+	}
+	
+	eeprom_write_byte(&EEPROM_PRESET, CURRENT_PRESET);
+	
 	loadPreset();
 }

@@ -18,16 +18,17 @@ extern void (*fireMethod)();
 extern void (*fireOnTriggerRelease)();
 
 void loadPreset();
+void delay_ms( int ms );
 int getPinMask(int pinNumber);
 void setInputPin(int pinNumber);
 void setOutputPin(int pinNumber);
 void pinOutput(int pinNumber, int state);
-void pinToggle(int pinNumber);
 int pinHasInput(int pinNumber);
 void initialize();
 void threeRoundBurst();
 void fullAuto();
 void singleShot();
+void togglePreset();
 
 
 #endif /* COMMON_H_ */

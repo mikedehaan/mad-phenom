@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
-Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "mad-phenom", "mad-phenom\mad-phenom.cppproj", "{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}"
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "mad-phenom", "mad-phenom\mad-phenom.cproj", "{48BEB32D-6183-42B3-8AC8-EC6E370F380A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|AVR = Release|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Debug|AVR.ActiveCfg = Debug|AVR
-		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Debug|AVR.Build.0 = Debug|AVR
-		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Release|AVR.ActiveCfg = Release|AVR
-		{CA7ABFAB-AAA8-4D81-9512-DF718BE64260}.Release|AVR.Build.0 = Release|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Debug|AVR.ActiveCfg = Debug|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Debug|AVR.Build.0 = Debug|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Release|AVR.ActiveCfg = Release|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

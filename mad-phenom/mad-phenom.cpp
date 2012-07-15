@@ -6,46 +6,54 @@
  */ 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "IdleState.h"
+#include "TriggerState.h"
 #include "Common.h"
 #include "Globals.h"
 
 #define F_CPU 8000000UL
 
-volatile uint32_t currentTimeInMillis = 0;
+volatile uint32_t millisecond = 0;
+uint8_t counter = 0;
 
+// This interrupt should occur approx. 3906 times per second
+// divide by 4 to get an approx millisecond
 ISR(TIM0_COMPA_vect) {
-	OCR0A += 200;
-	currentTimeInMillis++;
+	TCNT0 = 0;
+	counter++;
+	if (counter == 4) {
+		millisecond++;
+		counter = 0;
+	}
 }
 
 int main(void) {
 	
-	// Prescale the time to 1/8th of the system clock
-	//TCCR0B |= (1 << CS01);
-	
-	// Enable timer with no prescale
-	//TCCR0B |= (1 << CS00);
-
-	OCR0A = 200;
-
-	// Enable timer with 1/64th
-	TCCR0B |= (1 << CS00) | (1 << CS01);
-	
-	// enable timer overflow interrupt
-	//TIMSK0 |= 1 << TOIE0;
-	TIMSK0 |= 1 << OCIE0A;
-	
+	TCCR0B |= (1 << CS01);  // Enable timer with 1/8th prescale
+	TIMSK0 |= 1 << OCIE0A; // Configure Timer0 for Compare Match
+	OCR0A = 255; // Match at 200
+	sei();  // Enable global interrupts
 	
 	// Set pin 6 for output
 	setOutputPin(11);
 	pinOutput(11, LOW);
+
+	setOutputPin(SOLENOID_PIN);
+	pinOutput(SOLENOID_PIN, LOW);
+	
+	setInputPin(TRIGGER_PIN_1);
+	setInputPin(TRIGGER_PIN_2);
+	pinOutput(TRIGGER_PIN_1, HIGH);
+	pinOutput(TRIGGER_PIN_2, HIGH);
 	
 	sei();
 	
-	IdleState state;
+	initialize();
+	
+	TriggerState state;
+	State greenLed;
 
-	while(1) {
-		state.run(currentTimeInMillis);
+	while(1) {		
+		greenLed.run(millisecond);
+		state.run(millisecond);
 	}
 }

@@ -87,9 +87,9 @@ int pinHasInput(int pinNumber) {
 
 void pinToggle(int pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
-		PORTB ^= 1 << getPinMask(pinNumber);
+		PORTB ^= getPinMask(pinNumber);
 	} else if (pinNumber >= 6 && pinNumber <= 13) {
-		PORTA ^= 1 << getPinMask(pinNumber);
+		PORTA ^= getPinMask(pinNumber);
 	}
 }
 
@@ -113,6 +113,7 @@ void loadPreset() {
 	// Cutting this in down since I think the tippmann default is for trigger pull and release.
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
 	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
+	PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	
 	// Default to full auto
 	// 0 = full auto

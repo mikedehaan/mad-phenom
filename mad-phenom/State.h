@@ -11,6 +11,7 @@
 
 #include <avr/io.h>
 #include <stdbool.h>
+#include "Globals.h"
 
 class State {
 protected:
@@ -18,8 +19,7 @@ protected:
 	bool done;
 public:
 	State();
-	void run(uint32_t currentTime);
-	bool isDone();
+	void run(volatile uint32_t &millisecond);
 };
 
 #endif /* STATE_H_ */

@@ -30,6 +30,16 @@ uint8_t PULL_DEBOUNCE;  // Debounce in ms
 uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 uint8_t DWELL;
 
+
+uint32_t millis(const Clock &clock) {
+	uint32_t result = 0;
+	result += clock.millisecond;
+	result += clock.second * 1000L;
+	result += clock.minute * 60L * 1000L;
+	result += clock.hour * 60L * 60L * 1000L;
+	return result;
+}
+
 /*
   Initialize the EEPROM array
 */

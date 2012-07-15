@@ -39,4 +39,13 @@ extern uint8_t PULL_DEBOUNCE;  // Debounce in ms
 extern uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 extern uint8_t DWELL;
 
+struct Clock {
+	volatile unsigned int   millisecond;
+	volatile char        second;
+	volatile char        minute;
+	volatile char        hour;
+};
+
+uint32_t millis(const Clock &clock);
+
 #endif

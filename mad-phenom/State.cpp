@@ -9,14 +9,21 @@
 #include <stdbool.h>
 #include "State.h"
 #include "Common.h"
+#include "Globals.h"
 
 State::State() {
-	done = false;
 	lastUpdateTime = 0;	
 }
 
-void State::run(uint32_t currentTime) {
+void State::run(volatile uint32_t &millisecond) {
 	static uint8_t pinState = 0;
+	
+	uint32_t currentTime = millisecond;
+	
+	if ((currentTime - lastUpdateTime) >= 520) {
+		//pinOutput(SOLENOID_PIN, HIGH);
+	}		
+	
 	if ((currentTime - lastUpdateTime) >= 500) {
 		if (pinState == 0) {
 			pinOutput(11, HIGH);
@@ -28,7 +35,3 @@ void State::run(uint32_t currentTime) {
 		lastUpdateTime = currentTime;
 	}
 };
-
-bool State::isDone() {
-	return done;
-}

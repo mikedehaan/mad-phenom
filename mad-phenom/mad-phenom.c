@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
+#include <stdbool.h>
 
 #include "Globals.h"
 #include "Common.h"
@@ -17,6 +18,7 @@
 
 volatile uint32_t millis = 0;
 uint8_t counter = 0;
+bool triggerPulled = false;
 
 // This interrupt should occur approx. 3906 times per second
 // divide by 4 to get an approx millisecond
@@ -30,13 +32,12 @@ ISR(TIM0_COMPA_vect) {
 }
 
 int main(void) {
-	
+
 	TCCR0B |= (1 << CS01);  // Enable timer with 1/8th prescale
 	TIMSK0 |= 1 << OCIE0A; // Configure Timer0 for Compare Match
 	OCR0A = 255; // Match at 200
-	//DDRA |= 1 << 2; // Set pin 11 as output
-	//DDRA |= 1 << 7; // Set pin 6 as output
-	sei();  // Enable global interrupts	
+	
+	sei();  // Enable global interrupts
 	
 	initialize();
 	
@@ -52,10 +53,79 @@ int main(void) {
 	pinOutput(TRIGGER_PIN_2, HIGH);
 	pinOutput(PIN_PUSHBUTTON, HIGH);
 	
-    while(1) {
-		// This prevents time from changing within an iteration
-		uint32_t millisCopy = millis;
-		trigger_run(&millisCopy);
-		pushbutton_run(&millisCopy);
-    }
+	// If the button is held during startup, enter config mode.
+	uint16_t buttonHeldTime = 0;
+	bool configMode = false;
+	while (pinHasInput(3)) {
+		delay_ms(1);
+		
+		buttonHeldTime++;
+		if (buttonHeldTime > 3000) {
+			buttonHeldTime = 3000;
+		}
+	}
+	
+	if (buttonHeldTime >= 1000) {
+		configMode = true;
+		
+		// Some firing modes have 0 PULL_DEBOUNCE
+		// Reset so the menus work.
+		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
+	}	
+	
+	/*
+	// If the button is held during startup, enter config mode.
+	uint32_t buttonHeldTime = millis;
+	while (pinHasInput(3)) {
+		// don't do anything
+	}
+	
+	bool configMode = false;
+	if ((millis - buttonHeldTime) >= 1000) {
+		configMode = true;
+			
+		// Some firing modes have 0 PULL_DEBOUNCE
+		// Reset so the menus work.
+		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
+	}
+	*/
+	
+	if (configMode) {
+		// Initialize interrupts for the menu system
+		PCMSK1 |= (1 << PCINT10);  //Enable interrupts on PCINT10 (trigger)
+		PCMSK1 |= (1 << PCINT9);  // Enable interrupts for the push button
+		GIMSK = (1 << PCIE1);    //Enable interrupts period for PCI0 (PCINT11:8
+		
+		handleConfig();	
+	} else { // Normal run mode
+		while(1) {
+			// This prevents time from changing within an iteration
+			uint32_t millisCopy = millis;
+			trigger_run(&millisCopy);
+			pushbutton_run(&millisCopy);
+		}
+	}		
+}
+
+ISR(PCINT1_vect) {
+	if (!triggerPulled && (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2))) {
+		triggerPulled = true;
+
+		uint16_t buttonHeldTime = 0;
+		delay_ms(PULL_DEBOUNCE);
+		while (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) {
+			delay_ms(1);
+			buttonHeldTime += 1;
+			
+			if (buttonHeldTime > 3000) {
+				buttonHeldTime = 3000;
+			}
+		}
+		configTriggerPulled(buttonHeldTime);
+	}
+
+	if (triggerPulled && !pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2)) {		
+		delay_ms(RELEASE_DEBOUNCE);
+		triggerPulled = false;
+	}
 }

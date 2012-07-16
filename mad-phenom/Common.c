@@ -17,7 +17,7 @@ void delay_ms(uint16_t ms){
 	}
 }
 
-int getPinMask(uint8_t pinNumber) {
+uint8_t getPinMask(uint8_t pinNumber) {
 	if (pinNumber == 2) {
 		return (1 << PINB0);
 	} else if (pinNumber == 3) {
@@ -47,7 +47,7 @@ int getPinMask(uint8_t pinNumber) {
 	return 0;
 }
 
-void setInputPin(int pinNumber) {
+void setInputPin(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		DDRB &= ~(getPinMask(pinNumber));
 	} else if (pinNumber >=6 && pinNumber <= 13) {
@@ -55,7 +55,7 @@ void setInputPin(int pinNumber) {
 	}
 }
 
-void setOutputPin(int pinNumber) {
+void setOutputPin(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		DDRB |= (getPinMask(pinNumber));
 	} else if (pinNumber >= 6 && pinNumber <= 13) {
@@ -63,7 +63,7 @@ void setOutputPin(int pinNumber) {
 	}
 }
 
-void pinOutput(int pinNumber, int state) {
+void pinOutput(uint8_t pinNumber, uint8_t state) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		if (state == HIGH) {
 			PORTB |= (getPinMask(pinNumber));

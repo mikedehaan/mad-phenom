@@ -18,9 +18,10 @@
 		2 - 10
 
 */
+#define NOT_SELECTED 255
 volatile uint8_t currentMenu = 0;
 volatile uint8_t menuMax = 0;
-volatile uint8_t selectedMenu = -1;
+volatile uint8_t selectedMenu = NOT_SELECTED;
 
 /************************************************************************/
 /* Turns the orange LED on for 100ms then off                           */
@@ -38,9 +39,10 @@ void orangeLed() {
 
 uint8_t presetMenu() {
 	menuMax = 2;
-	selectedMenu = -1;
+	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
-	while(selectedMenu == -1) {
+	while(selectedMenu == NOT_SELECTED) {
+				
 		if (currentMenu == 0) { // Preset 1
 			orangeLed();
 			
@@ -53,7 +55,7 @@ uint8_t presetMenu() {
 			
 			delay_ms(800);
 		} else if (currentMenu == 2) {  // Preset 3
-			for (int i = 0; i < 3; i++) {
+			for (uint8_t i = 0; i < 3; i++) {
 				orangeLed();
 				delay_ms(100);
 			}
@@ -69,10 +71,10 @@ uint8_t presetMenu() {
 
 uint8_t mainMenu() {
 	menuMax = 2;
-	selectedMenu = -1;
+	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
 	uint8_t state = LOW;
-	while(selectedMenu == -1) {
+	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) { // Firing Mode
 			if (state == HIGH) {
 				state = LOW;
@@ -107,7 +109,7 @@ uint8_t mainMenu() {
 					for (uint8_t i = 0; i < 100; i++) {
 						delay_ms(10);
 						
-						if (selectedMenu > -1) {
+						if (selectedMenu != NOT_SELECTED) {
 							break;
 						}
 					}					
@@ -123,10 +125,10 @@ uint8_t mainMenu() {
 
 uint8_t firingModeMenu() {
 	menuMax = 2;
-	selectedMenu = -1;
+	selectedMenu = NOT_SELECTED;
 	currentMenu = FIRING_MODE;
 	uint8_t state = LOW;
-	while(selectedMenu == -1) {
+	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) {
 			if (state == HIGH) {
 				state = LOW;
@@ -147,7 +149,7 @@ uint8_t firingModeMenu() {
 				delay_ms(100);
 				pinOutput(11, LOW);
 				
-				if (selectedMenu > -1) {
+				if (selectedMenu != NOT_SELECTED) {
 					break;
 				}
 				
@@ -170,7 +172,7 @@ uint8_t firingModeMenu() {
 			delay_ms(100);
 			pinOutput(12, LOW);
 		
-			if (selectedMenu > -1) {
+			if (selectedMenu != NOT_SELECTED) {
 				break;
 			}
 		
@@ -214,12 +216,12 @@ void failureBlink() {
 uint8_t rateOfFireMenu() {
 	uint8_t state = LOW;
 	menuMax = 40;
-	selectedMenu = -1;
+	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
 	uint8_t currentRate = BALLS_PER_SECOND;
 	uint8_t displayRate = 0;
 	delay_ms(500);
-	while(selectedMenu == -1) {
+	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) {
 			if (state == HIGH) {
 				displayRate++;
@@ -258,12 +260,12 @@ uint8_t rateOfFireMenu() {
 uint8_t burstSizeMenu() {
 	uint8_t state = LOW;
 	menuMax = 10;
-	selectedMenu = -1;
+	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
 	uint8_t currentRate = BURST_SIZE;
 	uint8_t displayRate = 0;
 	delay_ms(500);
-	while(selectedMenu == -1) {
+	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) {
 			if (state == HIGH) {
 				displayRate++;
@@ -319,7 +321,7 @@ void handleConfig() {
 /************************************************************************/
 /* buttonHeldTime - The time in ms that the trigger was held for        */
 /************************************************************************/
-void configTriggerPulled(uint8_t buttonHeldTime) {
+void configTriggerPulled(uint32_t buttonHeldTime) {
 	
 	// Select the menu
 	if (buttonHeldTime >= 1000) {
@@ -332,8 +334,8 @@ void configTriggerPulled(uint8_t buttonHeldTime) {
 			currentMenu++;
 		}
 		
-		pinOutput(11, HIGH);
+		pinOutput(PIN_LED_GREEN, HIGH);
 		delay_ms(50);
-		pinOutput(11, LOW);
+		pinOutput(PIN_LED_GREEN, LOW);
 	}		
 }

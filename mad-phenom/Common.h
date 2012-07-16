@@ -16,10 +16,10 @@
 
 void loadPreset();
 void delay_ms(uint16_t ms );
-int getPinMask(uint8_t pinNumber);
-void setInputPin(int pinNumber);
-void setOutputPin(int pinNumber);
-void pinOutput(int pinNumber, int state);
+uint8_t getPinMask(uint8_t pinNumber);
+void setInputPin(uint8_t pinNumber);
+void setOutputPin(uint8_t pinNumber);
+void pinOutput(uint8_t pinNumber, uint8_t state);
 uint8_t pinHasInput(uint8_t pinNumber);
 void initialize();
 void threeRoundBurst();

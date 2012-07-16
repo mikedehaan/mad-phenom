@@ -6,44 +6,42 @@
 #include "Common.h"
 #include "Globals.h"
 
+
 /************************************************************************/
 /*  COMMON ROUTINES                                                     */
 /************************************************************************/
 
-void (*fireMethod)() = 0;
-void (*fireOnTriggerRelease)() = 0;
-
-void delay_ms( int ms ){
+void delay_ms(uint16_t ms){
 	for (int i = 0; i < ms; i++) {
 		_delay_ms(1);
 	}
 }
 
-int getPinMask(int pinNumber) {
+int getPinMask(uint8_t pinNumber) {
 	if (pinNumber == 2) {
-		return (1 << 0);
+		return (1 << PINB0);
 	} else if (pinNumber == 3) {
-		return (1 << 1);
+		return (1 << PINB1);
 	} else if (pinNumber == 4) {
-		return (1 << 3);
+		return (1 << PINB3);
 	} else if (pinNumber == 5) {
-		return (1 << 2);
+		return (1 << PINB2);
 	} else if (pinNumber == 6) {
-		return (1 << 7);
+		return (1 << PINA7);
 	} else if (pinNumber == 7) {
-		return (1 << 6);
+		return (1 << PINA6);
 	} else if (pinNumber == 8) {
-		return (1 << 5);
+		return (1 << PINA5);
 	} else if (pinNumber == 9) {
-		return (1 << 4);
+		return (1 << PINA4);
 	} else if (pinNumber == 10) {
-		return (1 << 3);
+		return (1 << PINA3);
 	} else if (pinNumber == 11) {
-		return (1 << 2);
+		return (1 << PINA2);
 	} else if (pinNumber == 12) {
-		return (1 << 1);
+		return (1 << PINA1);
 	} else if (pinNumber == 13) {
-		return (1 << 0);
+		return (1 << PINA0);
 	}
 	
 	return 0;
@@ -81,7 +79,7 @@ void pinOutput(int pinNumber, int state) {
 	}
 }
 
-int pinHasInput(int pinNumber) {
+uint8_t pinHasInput(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		return (PINB & (getPinMask(pinNumber))) <= 0;
 	} else if (pinNumber >= 6 && pinNumber <= 13) {

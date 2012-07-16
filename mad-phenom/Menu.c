@@ -18,15 +18,15 @@
 		2 - 10
 
 */
-volatile int currentMenu = 0;
-volatile int menuMax = 0;
-volatile int selectedMenu = -1;
+volatile uint8_t currentMenu = 0;
+volatile uint8_t menuMax = 0;
+volatile uint8_t selectedMenu = -1;
 
 /************************************************************************/
 /* Turns the orange LED on for 100ms then off                           */
 /************************************************************************/
 void orangeLed() {
-	for (int x = 0; x < 33; x++) {
+	for (uint8_t x = 0; x < 33; x++) {
 		pinOutput(11, HIGH);
 		delay_ms(2);
 		pinOutput(11, LOW);
@@ -36,7 +36,7 @@ void orangeLed() {
 	}	
 }
 
-int presetMenu() {
+uint8_t presetMenu() {
 	menuMax = 2;
 	selectedMenu = -1;
 	currentMenu = 0;
@@ -46,7 +46,7 @@ int presetMenu() {
 			
 			delay_ms(800);
 		} else if (currentMenu == 1) { // Preset 2
-			for (int i = 0; i < 2; i++) {
+			for (uint8_t i = 0; i < 2; i++) {
 				orangeLed();
 				delay_ms(100);
 			}
@@ -67,11 +67,11 @@ int presetMenu() {
 	return selectedMenu;
 }
 
-int mainMenu() {
+uint8_t mainMenu() {
 	menuMax = 2;
 	selectedMenu = -1;
 	currentMenu = 0;
-	int state = LOW;
+	uint8_t state = LOW;
 	while(selectedMenu == -1) {
 		if (currentMenu == 0) { // Firing Mode
 			if (state == HIGH) {
@@ -98,13 +98,13 @@ int mainMenu() {
 			pinOutput(11, LOW);
 			
 			// Display as three blinks of red then pause and repeat
-			for (int i = 0; i < 3; i++) {
+			for (uint8_t i = 0; i < 3; i++) {
 				pinOutput(12, HIGH);
 				delay_ms(100);
 				pinOutput(12, LOW);
 				
 				if (i == 2) {
-					for (int i = 0; i < 100; i++) {
+					for (uint8_t i = 0; i < 100; i++) {
 						delay_ms(10);
 						
 						if (selectedMenu > -1) {
@@ -121,11 +121,11 @@ int mainMenu() {
 	return selectedMenu;
 }
 
-int firingModeMenu() {
+uint8_t firingModeMenu() {
 	menuMax = 2;
 	selectedMenu = -1;
 	currentMenu = FIRING_MODE;
-	int state = LOW;
+	uint8_t state = LOW;
 	while(selectedMenu == -1) {
 		if (currentMenu == 0) {
 			if (state == HIGH) {
@@ -142,7 +142,7 @@ int firingModeMenu() {
 			pinOutput(11, LOW);
 			
 			// Display as three blinks of green then pause and repeat
-			for (int i = 0; i < 3; i++) {
+			for (uint8_t i = 0; i < 3; i++) {
 				pinOutput(11, HIGH);
 				delay_ms(100);
 				pinOutput(11, LOW);
@@ -189,8 +189,8 @@ int firingModeMenu() {
 }
 
 void successBlink() {
-	for (int i = 0; i < 3; i++) {
-		for (int x = 0; x < 200; x++) {
+	for (uint8_t i = 0; i < 3; i++) {
+		for (uint8_t x = 0; x < 200; x++) {
 			pinOutput(11, HIGH);
 			delay_ms(2);
 			pinOutput(11, LOW);
@@ -203,7 +203,7 @@ void successBlink() {
 
 void failureBlink() {
 	delay_ms(200);
-	for (int i = 0; i < 10; i++) {
+	for (uint8_t i = 0; i < 10; i++) {
 		pinOutput(12, HIGH);
 		delay_ms(50);
 		pinOutput(12, LOW);
@@ -211,13 +211,13 @@ void failureBlink() {
 	}
 }
 
-int rateOfFireMenu() {
-	int state = LOW;
+uint8_t rateOfFireMenu() {
+	uint8_t state = LOW;
 	menuMax = 40;
 	selectedMenu = -1;
 	currentMenu = 0;
-	int currentRate = BALLS_PER_SECOND;
-	int displayRate = 0;
+	uint8_t currentRate = BALLS_PER_SECOND;
+	uint8_t displayRate = 0;
 	delay_ms(500);
 	while(selectedMenu == -1) {
 		if (currentMenu == 0) {
@@ -255,13 +255,13 @@ int rateOfFireMenu() {
 	return selectedMenu;
 }
 
-int burstSizeMenu() {
-	int state = LOW;
+uint8_t burstSizeMenu() {
+	uint8_t state = LOW;
 	menuMax = 10;
 	selectedMenu = -1;
 	currentMenu = 0;
-	int currentRate = BURST_SIZE;
-	int displayRate = 0;
+	uint8_t currentRate = BURST_SIZE;
+	uint8_t displayRate = 0;
 	delay_ms(500);
 	while(selectedMenu == -1) {
 		if (currentMenu == 0) {
@@ -319,7 +319,7 @@ void handleConfig() {
 /************************************************************************/
 /* buttonHeldTime - The time in ms that the trigger was held for        */
 /************************************************************************/
-void configTriggerPulled(int buttonHeldTime) {
+void configTriggerPulled(uint8_t buttonHeldTime) {
 	
 	// Select the menu
 	if (buttonHeldTime >= 1000) {

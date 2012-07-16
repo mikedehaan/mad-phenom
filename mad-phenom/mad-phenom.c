@@ -48,8 +48,10 @@ int main(void) {
 	
 	pinOutput(TRIGGER_PIN_1, HIGH);
 	pinOutput(TRIGGER_PIN_2, HIGH);
+	pinOutput(PIN_PUSHBUTTON, HIGH);
 	
     while(1) {
-        trigger_run(millis);
+		uint32_t millisCopy = millis;
+        trigger_run(&millisCopy);		
     }
 }

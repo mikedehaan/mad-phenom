@@ -11,7 +11,8 @@
 
 #include <avr/io.h>
 
-void solenoid_run(volatile uint32_t millis);
+void solenoid_run(volatile uint32_t *millis);
+void solenoid_run_callback(volatile uint32_t *millis, int (*solenoidCompleteFunction)());
 void solenoid_reset();
 
 #endif /* SOLENOID_H_ */

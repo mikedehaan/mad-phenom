@@ -14,16 +14,13 @@
 #define HIGH 1
 #define LOW 0
 
-extern void (*fireMethod)();
-extern void (*fireOnTriggerRelease)();
-
 void loadPreset();
-void delay_ms( int ms );
-int getPinMask(int pinNumber);
+void delay_ms(uint16_t ms );
+int getPinMask(uint8_t pinNumber);
 void setInputPin(int pinNumber);
 void setOutputPin(int pinNumber);
 void pinOutput(int pinNumber, int state);
-int pinHasInput(int pinNumber);
+uint8_t pinHasInput(uint8_t pinNumber);
 void initialize();
 void threeRoundBurst();
 void togglePreset();

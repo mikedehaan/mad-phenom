@@ -4,6 +4,6 @@
 void handleConfig();
 void successBlink();
 void failureBlink();
-void configTriggerPulled(int buttonHeldTime);
+void configTriggerPulled(uint8_t buttonHeldTime);
 
 #endif /* MENU_H_ */

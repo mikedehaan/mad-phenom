@@ -5,7 +5,7 @@
 #include <util/delay.h>
 #include "Common.h"
 #include "Globals.h"
-
+#include "Trigger.h"
 
 /************************************************************************/
 /*  COMMON ROUTINES                                                     */
@@ -118,19 +118,8 @@ void loadPreset() {
 		FIRING_MODE = 0;
 	}
 
-	if (FIRING_MODE == 0) { // Full Auto
-		//fireMethod = &fullAuto;
-		//fireOnTriggerRelease = 0;
-		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-	} else if (FIRING_MODE == 1) { // Three Round Burst
-		//fireMethod = &threeRoundBurst;
-		//fireOnTriggerRelease = 0;
-		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-	} else {
-		//PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-		//fireMethod = &singleShot;
-		//fireOnTriggerRelease = &singleShot;
-	}	
+	// Activate the new FIRING_MODE
+	trigger_changeMode();
 }
 
 void initialize() {

@@ -13,6 +13,7 @@
 #include "Common.h"
 #include "Menu.h"
 #include "Trigger.h"
+#include "PushButton.h"
 
 volatile uint32_t millis = 0;
 uint8_t counter = 0;
@@ -41,9 +42,10 @@ int main(void) {
 	
 	setOutputPin(PIN_LED_RED);
 	setOutputPin(PIN_LED_GREEN);
+	setOutputPin(PIN_SOLENOID);
+
 	setInputPin(TRIGGER_PIN_1);
 	setInputPin(TRIGGER_PIN_2);
-	setOutputPin(PIN_SOLENOID);
 	setInputPin(PIN_PUSHBUTTON); // Push button	
 	
 	pinOutput(TRIGGER_PIN_1, HIGH);
@@ -51,7 +53,9 @@ int main(void) {
 	pinOutput(PIN_PUSHBUTTON, HIGH);
 	
     while(1) {
+		// This prevents time from changing within an iteration
 		uint32_t millisCopy = millis;
-        trigger_run(&millisCopy);		
+		trigger_run(&millisCopy);
+		pushbutton_run(&millisCopy);
     }
 }

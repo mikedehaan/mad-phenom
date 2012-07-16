@@ -18,7 +18,7 @@ void solenoid_run(volatile uint32_t *millis) {
 	solenoid_run_callback(millis, 0);
 }
 
-void solenoid_run_callback(volatile uint32_t *millis, int (*solenoidCompleteFunction)()) {
+void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFunction)()) {
 	if (solenoidDone) {
 		return;
 	}

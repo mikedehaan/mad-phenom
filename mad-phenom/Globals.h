@@ -4,6 +4,7 @@
 #include <avr/eeprom.h>
 
 #define MAX_PRESETS 3
+
 #define TRIGGER_PIN_1 5
 #define TRIGGER_PIN_2 7
 #define PIN_LED_GREEN 11

@@ -9,6 +9,9 @@
 #ifndef TRIGGER_H_
 #define TRIGGER_H_
 
-void trigger_run(volatile uint32_t *millisecond);
+#include <avr/io.h>
+
+void trigger_run(uint32_t *millisecond);
+void trigger_changeMode();
 
 #endif /* TRIGGER_H_ */

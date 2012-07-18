@@ -23,7 +23,14 @@ void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFun
 		return;
 	}
 	
+	// If the Solenoid is not currently active, and an ammo limit is set, do not fire!
+	if (!solenoidActive && AMMO_LIMIT != 0 && shotsFired >= AMMO_LIMIT) {
+		solenoidDone = true;
+		return;
+	}
+	
 	if (!solenoidActive) {  // Activate the Solenoid
+		shotsFired++;
 		pinOutput(PIN_SOLENOID, HIGH);
 		activeTime = (*millis);
 		solenoidActive = true;

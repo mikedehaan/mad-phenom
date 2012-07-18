@@ -12,7 +12,7 @@
 /************************************************************************/
 
 void delay_ms(uint16_t ms){
-	for (int i = 0; i < ms; i++) {
+	for (uint16_t i = 0; i < ms; i++) {
 		_delay_ms(1);
 	}
 }
@@ -93,6 +93,7 @@ void loadPreset() {
 	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET]);
 	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET]);
 	BURST_SIZE = eeprom_read_byte(&EEPROM_BURST_SIZE[CURRENT_PRESET]);
+	AMMO_LIMIT = eeprom_read_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET]);
 	
 	// If the data is invalid, use default values
 	if (BALLS_PER_SECOND < 5 || BALLS_PER_SECOND > 40) {
@@ -102,6 +103,10 @@ void loadPreset() {
 	// Default to 3 round burst
 	if (BURST_SIZE < 2 || BURST_SIZE > 10) {
 		BURST_SIZE = 3;
+	}
+	
+	if (AMMO_LIMIT > 250) {
+		AMMO_LIMIT = 0;
 	}
 	
 	DWELL = 8;
@@ -126,14 +131,17 @@ void initialize() {
 	EEPROM_BALLS_PER_SECOND[0] = EEPROM_BALLS_PER_SECOND_1;
 	EEPROM_FIRING_MODE[0] = EEPROM_FIRING_MODE_1;
 	EEPROM_BURST_SIZE[0] = EEPROM_BURST_SIZE_1;
+	EEPROM_AMMO_LIMIT[0] = EEPROM_AMMO_LIMIT_1;
 
 	EEPROM_BALLS_PER_SECOND[1] = EEPROM_BALLS_PER_SECOND_2;
 	EEPROM_FIRING_MODE[1] = EEPROM_FIRING_MODE_2;
 	EEPROM_BURST_SIZE[1] = EEPROM_BURST_SIZE_2;
+	EEPROM_AMMO_LIMIT[1] = EEPROM_AMMO_LIMIT_2;
 
 	EEPROM_BALLS_PER_SECOND[2] = EEPROM_BALLS_PER_SECOND_3;
 	EEPROM_FIRING_MODE[2] = EEPROM_FIRING_MODE_3;
 	EEPROM_BURST_SIZE[2] = EEPROM_BURST_SIZE_3;
+	EEPROM_AMMO_LIMIT[2] = EEPROM_AMMO_LIMIT_3;
 
 	CURRENT_PRESET = eeprom_read_byte(&EEPROM_PRESET);
 	if (CURRENT_PRESET < 0 || CURRENT_PRESET > (MAX_PRESETS - 1)) {

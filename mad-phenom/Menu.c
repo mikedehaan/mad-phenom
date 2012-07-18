@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include "Globals.h"
 #include "Common.h"
 #include "Menu.h"
@@ -23,21 +24,49 @@ volatile uint8_t currentMenu = 0;
 volatile uint8_t menuMax = 0;
 volatile uint8_t selectedMenu = NOT_SELECTED;
 
+void getNumberFromUser(uint8_t currentNumber, uint8_t max);
+
+/*
+void setLedState(bool redOn, bool greenOn) {
+	pinOutput(PIN_LED_RED, (redOn ? HIGH : LOW));
+	pinOutput(PIN_LED_GREEN, (greenOn ? HIGH : LOW));	
+}
+*/
+/*
+void ledWithDelay(uint8_t led1, bool led1State, uint16_t delay, uint8_t led2, bool led2State) {
+	pinOutput(led1, led1State);
+	delay_ms(delay);
+	pinOutput(led2, led2State);
+}
+*/
+void lightsOff() {
+	PORTA &= ~(1 << PINA2); // GREEN
+	PORTA &= ~(1 << PINA1); // RED
+}
+
+void redOff() {
+	PORTA &= ~(1 << PINA1); // RED
+}
+
+void greenOff() {
+	PORTA &= ~(1 << PINA2); // GREEN
+}
 /************************************************************************/
 /* Turns the orange LED on for 100ms then off                           */
 /************************************************************************/
 void orangeLed() {
 	for (uint8_t x = 0; x < 33; x++) {
-		pinOutput(11, HIGH);
+		pinOutput(PIN_LED_GREEN, HIGH);
 		delay_ms(2);
-		pinOutput(11, LOW);
-		pinOutput(12, HIGH);
+		pinOutput(PIN_LED_RED, HIGH);
+		
+		pinOutput(PIN_LED_GREEN, LOW);
 		delay_ms(1);
-		pinOutput(12, LOW);
+		pinOutput(PIN_LED_RED, LOW);
 	}	
 }
 
-uint8_t presetMenu() {
+void presetMenu() {
 	menuMax = 2;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
@@ -45,7 +74,6 @@ uint8_t presetMenu() {
 				
 		if (currentMenu == 0) { // Preset 1
 			orangeLed();
-			
 			delay_ms(800);
 		} else if (currentMenu == 1) { // Preset 2
 			for (uint8_t i = 0; i < 2; i++) {
@@ -65,45 +93,38 @@ uint8_t presetMenu() {
 	}
 	
 	CURRENT_PRESET = selectedMenu;
-	
-	return selectedMenu;
 }
 
-uint8_t mainMenu() {
-	menuMax = 2;
+void mainMenu() {
+	menuMax = 3;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
-	uint8_t state = LOW;
+	bool state = false;
 	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) { // Firing Mode
-			if (state == HIGH) {
-				state = LOW;
-			} else {
-				state = HIGH;
-			}
+			state = !state;
 			
-			pinOutput(12, !state);
-			pinOutput(11, state);
+			pinOutput(PIN_LED_RED, !state);
+			pinOutput(PIN_LED_GREEN, state);
+						
 			delay_ms(100);
 		} else if (currentMenu == 1) { // Firing Rate
-			if (state == HIGH) {
-				state = LOW;
-			} else {
-				state = HIGH;
-			}
+			state = !state;
 			
-			pinOutput(12, LOW);
-			pinOutput(11, state);
+			pinOutput(PIN_LED_RED, LOW);
+			pinOutput(PIN_LED_GREEN, state);				
+			
 			delay_ms(50);
 		} else if (currentMenu == 2) {  // Burst size
-			pinOutput(12, LOW);
-			pinOutput(11, LOW);
+			//pinOutput(PIN_LED_RED, LOW);
+			//pinOutput(PIN_LED_GREEN, LOW);
+			lightsOff();
 			
 			// Display as three blinks of red then pause and repeat
 			for (uint8_t i = 0; i < 3; i++) {
-				pinOutput(12, HIGH);
+				pinOutput(PIN_LED_RED, HIGH);
 				delay_ms(100);
-				pinOutput(12, LOW);
+				pinOutput(PIN_LED_RED, LOW);
 				
 				if (i == 2) {
 					for (uint8_t i = 0; i < 100; i++) {
@@ -117,37 +138,36 @@ uint8_t mainMenu() {
 					delay_ms(100);
 				}
 			}
-		}
+		} else if (currentMenu == 3) {  // Ammo Limit
+			pinOutput(PIN_LED_RED, HIGH);
+			pinOutput(PIN_LED_GREEN, LOW);
+		}			
 	}
-	
-	return selectedMenu;
 }
 
-uint8_t firingModeMenu() {
+void firingModeMenu() {
 	menuMax = 2;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = FIRING_MODE;
-	uint8_t state = LOW;
+	bool state = LOW;
 	while(selectedMenu == NOT_SELECTED) {
 		if (currentMenu == 0) {
-			if (state == HIGH) {
-				state = LOW;
-			} else {
-				state = HIGH;
-			}
+			state = !state;
 			
-			pinOutput(11, LOW);
-			pinOutput(12, state);
+			pinOutput(PIN_LED_RED, state);
+			pinOutput(PIN_LED_GREEN, LOW);
+			
 			delay_ms(50);
 		} else if (currentMenu == 1) { // Three Round Burst
-			pinOutput(12, LOW);
-			pinOutput(11, LOW);
+			//pinOutput(PIN_LED_RED, LOW);
+			//pinOutput(PIN_LED_GREEN, LOW);
+			lightsOff();
 			
 			// Display as three blinks of green then pause and repeat
 			for (uint8_t i = 0; i < 3; i++) {
-				pinOutput(11, HIGH);
+				pinOutput(PIN_LED_GREEN, HIGH);
 				delay_ms(100);
-				pinOutput(11, LOW);
+				pinOutput(PIN_LED_GREEN, LOW);
 				
 				if (selectedMenu != NOT_SELECTED) {
 					break;
@@ -160,18 +180,17 @@ uint8_t firingModeMenu() {
 				}
 			}				
 		} else if (currentMenu == 2) { // Auto Response
-			pinOutput(12, LOW);
-			pinOutput(11, LOW);
+			lightsOff();
 	
 			// Display as blink green, blink red, then pause
-			pinOutput(11, HIGH);
+			pinOutput(PIN_LED_GREEN, HIGH);
 			delay_ms(100);
-			pinOutput(11, LOW);
+			pinOutput(PIN_LED_GREEN, LOW);
 			delay_ms(100);
-			pinOutput(12, HIGH);
+			pinOutput(PIN_LED_RED, HIGH);
 			delay_ms(100);
-			pinOutput(12, LOW);
-		
+			pinOutput(PIN_LED_RED, LOW);
+
 			if (selectedMenu != NOT_SELECTED) {
 				break;
 			}
@@ -186,19 +205,30 @@ uint8_t firingModeMenu() {
 	} else {
 		failureBlink();
 	}
+}
+
+void ammoLimitMenu() {
+	 getNumberFromUser(AMMO_LIMIT, 250);
 	
-	return selectedMenu;	
+	// Burst size was entered into selectedMenu.  Verify it and save it.
+	if (selectedMenu >= 0 && selectedMenu <= 250) {
+		eeprom_write_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET], selectedMenu);
+		AMMO_LIMIT = selectedMenu;
+		successBlink();
+	} else {
+		failureBlink();
+	}
 }
 
 void successBlink() {
 	for (uint8_t i = 0; i < 3; i++) {
 		for (uint8_t x = 0; x < 200; x++) {
-			pinOutput(11, HIGH);
+			pinOutput(PIN_LED_GREEN, HIGH);
 			delay_ms(2);
-			pinOutput(11, LOW);
-			pinOutput(12, HIGH);
+			pinOutput(PIN_LED_RED, HIGH);
+			pinOutput(PIN_LED_GREEN, LOW);
 			delay_ms(1);
-			pinOutput(12, LOW);
+			pinOutput(PIN_LED_RED, LOW);
 		}
 	}
 }
@@ -206,46 +236,17 @@ void successBlink() {
 void failureBlink() {
 	delay_ms(200);
 	for (uint8_t i = 0; i < 10; i++) {
-		pinOutput(12, HIGH);
+		pinOutput(PIN_LED_RED, HIGH);
 		delay_ms(50);
-		pinOutput(12, LOW);
+		pinOutput(PIN_LED_RED, LOW);
 		delay_ms(50);
 	}
 }
 
-uint8_t rateOfFireMenu() {
-	uint8_t state = LOW;
-	menuMax = 40;
-	selectedMenu = NOT_SELECTED;
-	currentMenu = 0;
-	uint8_t currentRate = BALLS_PER_SECOND;
-	uint8_t displayRate = 0;
-	delay_ms(500);
-	while(selectedMenu == NOT_SELECTED) {
-		if (currentMenu == 0) {
-			if (state == HIGH) {
-				displayRate++;
-				state = LOW;
-			} else {
-				state = HIGH;
-			}
-			
-			pinOutput(11, state);
-			pinOutput(12, LOW);
-			delay_ms(200);
-		
-			if (displayRate >= currentRate) {
-				displayRate = 0;
-				delay_ms(1000);
-			}
-		} else {
-			pinOutput(11, LOW);
-			pinOutput(12, LOW);
-		}
-	}
+void rateOfFireMenu() {
+	 getNumberFromUser(BALLS_PER_SECOND, 40);
 	
 	// Firing rate was entered into selectedMenu.  Verify it and save it.
-	
 	if (selectedMenu >= 5 && selectedMenu <= 40) {
 		eeprom_write_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET], selectedMenu);
 		BALLS_PER_SECOND = selectedMenu;
@@ -253,40 +254,10 @@ uint8_t rateOfFireMenu() {
 	} else {
 		failureBlink();
 	}
-	
-	return selectedMenu;
 }
 
-uint8_t burstSizeMenu() {
-	uint8_t state = LOW;
-	menuMax = 10;
-	selectedMenu = NOT_SELECTED;
-	currentMenu = 0;
-	uint8_t currentRate = BURST_SIZE;
-	uint8_t displayRate = 0;
-	delay_ms(500);
-	while(selectedMenu == NOT_SELECTED) {
-		if (currentMenu == 0) {
-			if (state == HIGH) {
-				displayRate++;
-				state = LOW;
-			} else {
-				state = HIGH;
-			}
-			
-			pinOutput(11, state);
-			pinOutput(12, LOW);
-			delay_ms(200);
-			
-			if (displayRate >= currentRate) {
-				displayRate = 0;
-				delay_ms(1000);
-			}
-		} else {
-			pinOutput(11, LOW);
-			pinOutput(12, LOW);
-		}
-	}
+void burstSizeMenu() {
+	getNumberFromUser(BURST_SIZE, 10);
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 2 && selectedMenu <= 10) {
@@ -296,8 +267,39 @@ uint8_t burstSizeMenu() {
 	} else {
 		failureBlink();
 	}
-	
-	return selectedMenu;
+}
+
+void getNumberFromUser(uint8_t currentNumber, uint8_t max) {
+	bool state = false;
+	menuMax = max;
+	selectedMenu = NOT_SELECTED;
+	currentMenu = 0;
+	uint8_t currentRate = currentNumber;
+	uint8_t displayRate = 0;
+	delay_ms(500);
+	while(selectedMenu == NOT_SELECTED) {
+		if (currentMenu == 0) {
+			if (state) {
+				displayRate++;
+			}
+			
+			state = !state;
+			
+			pinOutput(PIN_LED_RED, LOW);
+			pinOutput(PIN_LED_GREEN, state);
+			
+			delay_ms(200);
+			
+			if (displayRate >= currentRate) {
+				displayRate = 0;
+				delay_ms(1000);
+			}
+		} else {
+			//pinOutput(PIN_LED_RED, LOW);
+			//pinOutput(PIN_LED_GREEN, LOW);
+			lightsOff();
+		}
+	}
 }
 
 void handleConfig() {
@@ -314,6 +316,8 @@ void handleConfig() {
 			rateOfFireMenu();
 		} else if (selectedMenu == 2) {
 			burstSizeMenu();
+		} else if (selectedMenu == 3) {
+			ammoLimitMenu();
 		}
 	}			
 }

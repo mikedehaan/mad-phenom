@@ -162,3 +162,19 @@ void togglePreset(){
 	
 	loadPreset();
 }
+
+void redOff() {
+	PORTA &= ~(1 << PINA1); // RED
+}
+
+void greenOff() {
+	PORTA &= ~(1 << PINA2); // GREEN
+}
+
+void redOn() {
+	PORTA |= (1 << PINA1); // RED
+}
+
+void greenOn() {
+	PORTA |= (1 << PINA2); // RED
+}

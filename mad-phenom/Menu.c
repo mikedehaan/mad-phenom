@@ -44,25 +44,18 @@ void lightsOff() {
 	PORTA &= ~(1 << PINA1); // RED
 }
 
-void redOff() {
-	PORTA &= ~(1 << PINA1); // RED
-}
-
-void greenOff() {
-	PORTA &= ~(1 << PINA2); // GREEN
-}
 /************************************************************************/
 /* Turns the orange LED on for 100ms then off                           */
 /************************************************************************/
 void orangeLed() {
 	for (uint8_t x = 0; x < 33; x++) {
-		pinOutput(PIN_LED_GREEN, HIGH);
+		greenOn();
 		delay_ms(2);
-		pinOutput(PIN_LED_RED, HIGH);
+		redOn();
 		
-		pinOutput(PIN_LED_GREEN, LOW);
+		greenOff();
 		delay_ms(1);
-		pinOutput(PIN_LED_RED, LOW);
+		redOff();
 	}	
 }
 
@@ -111,7 +104,7 @@ void mainMenu() {
 		} else if (currentMenu == 1) { // Firing Rate
 			state = !state;
 			
-			pinOutput(PIN_LED_RED, LOW);
+			redOff();
 			pinOutput(PIN_LED_GREEN, state);				
 			
 			delay_ms(50);
@@ -122,9 +115,9 @@ void mainMenu() {
 			
 			// Display as three blinks of red then pause and repeat
 			for (uint8_t i = 0; i < 3; i++) {
-				pinOutput(PIN_LED_RED, HIGH);
+				redOn();
 				delay_ms(100);
-				pinOutput(PIN_LED_RED, LOW);
+				redOff();
 				
 				if (i == 2) {
 					for (uint8_t i = 0; i < 100; i++) {
@@ -139,8 +132,8 @@ void mainMenu() {
 				}
 			}
 		} else if (currentMenu == 3) {  // Ammo Limit
-			pinOutput(PIN_LED_RED, HIGH);
-			pinOutput(PIN_LED_GREEN, LOW);
+			redOn();
+			greenOff();
 		}			
 	}
 }
@@ -155,7 +148,7 @@ void firingModeMenu() {
 			state = !state;
 			
 			pinOutput(PIN_LED_RED, state);
-			pinOutput(PIN_LED_GREEN, LOW);
+			greenOff();
 			
 			delay_ms(50);
 		} else if (currentMenu == 1) { // Three Round Burst
@@ -165,9 +158,9 @@ void firingModeMenu() {
 			
 			// Display as three blinks of green then pause and repeat
 			for (uint8_t i = 0; i < 3; i++) {
-				pinOutput(PIN_LED_GREEN, HIGH);
+				greenOn();
 				delay_ms(100);
-				pinOutput(PIN_LED_GREEN, LOW);
+				greenOff();
 				
 				if (selectedMenu != NOT_SELECTED) {
 					break;
@@ -183,13 +176,13 @@ void firingModeMenu() {
 			lightsOff();
 	
 			// Display as blink green, blink red, then pause
-			pinOutput(PIN_LED_GREEN, HIGH);
+			greenOn();
 			delay_ms(100);
-			pinOutput(PIN_LED_GREEN, LOW);
+			greenOff();
 			delay_ms(100);
-			pinOutput(PIN_LED_RED, HIGH);
+			redOn();
 			delay_ms(100);
-			pinOutput(PIN_LED_RED, LOW);
+			redOff();
 
 			if (selectedMenu != NOT_SELECTED) {
 				break;
@@ -223,12 +216,12 @@ void ammoLimitMenu() {
 void successBlink() {
 	for (uint8_t i = 0; i < 3; i++) {
 		for (uint8_t x = 0; x < 200; x++) {
-			pinOutput(PIN_LED_GREEN, HIGH);
+			greenOn();
 			delay_ms(2);
-			pinOutput(PIN_LED_RED, HIGH);
-			pinOutput(PIN_LED_GREEN, LOW);
+			redOn();
+			greenOff();
 			delay_ms(1);
-			pinOutput(PIN_LED_RED, LOW);
+			redOff();
 		}
 	}
 }
@@ -236,9 +229,9 @@ void successBlink() {
 void failureBlink() {
 	delay_ms(200);
 	for (uint8_t i = 0; i < 10; i++) {
-		pinOutput(PIN_LED_RED, HIGH);
+		redOn();
 		delay_ms(50);
-		pinOutput(PIN_LED_RED, LOW);
+		redOff();
 		delay_ms(50);
 	}
 }
@@ -285,7 +278,7 @@ void getNumberFromUser(uint8_t currentNumber, uint8_t max) {
 			
 			state = !state;
 			
-			pinOutput(PIN_LED_RED, LOW);
+			redOff();
 			pinOutput(PIN_LED_GREEN, state);
 			
 			delay_ms(200);
@@ -338,8 +331,8 @@ void configTriggerPulled(uint32_t buttonHeldTime) {
 			currentMenu++;
 		}
 		
-		pinOutput(PIN_LED_GREEN, HIGH);
+		greenOn();
 		delay_ms(50);
-		pinOutput(PIN_LED_GREEN, LOW);
+		greenOff();
 	}		
 }

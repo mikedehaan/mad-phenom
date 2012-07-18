@@ -24,5 +24,9 @@ uint8_t pinHasInput(uint8_t pinNumber);
 void initialize();
 void togglePreset();
 
+void redOff();
+void greenOff();
+void redOn();
+void greenOn();
 
 #endif /* COMMON_H_ */

@@ -31,13 +31,14 @@ void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFun
 	
 	if (!solenoidActive) {  // Activate the Solenoid
 		shotsFired++;
-		pinOutput(PIN_SOLENOID, HIGH);
+		//pinOutput(PIN_SOLENOID, HIGH);
+		solenoidOn();
 		activeTime = (*millis);
 		solenoidActive = true;
 	}
 	
 	if (solenoidActive && (((*millis) - activeTime) >= DWELL)) {
-		pinOutput(PIN_SOLENOID, LOW);
+		solenoidOff();
 		solenoidDone = true;
 		solenoidActive = false;
 		if (solenoidCompleteFunction != 0) {

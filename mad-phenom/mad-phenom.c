@@ -49,9 +49,15 @@ int main(void) {
 	setInputPin(TRIGGER_PIN_2);
 	setInputPin(PIN_PUSHBUTTON); // Push button	
 	
-	pinOutput(TRIGGER_PIN_1, HIGH);
-	pinOutput(TRIGGER_PIN_2, HIGH);
-	pinOutput(PIN_PUSHBUTTON, HIGH);
+	// Set Triggers HIGH
+	//pinOutput(TRIGGER_PIN_1, HIGH);
+	//pinOutput(TRIGGER_PIN_2, HIGH);
+	PORTB |= (1 << PINB2);
+	PORTA |= (1 << PINA6);
+	
+	// Set Pushbutton HIGH
+	//pinOutput(PIN_PUSHBUTTON, HIGH);
+	PORTB |= (1 << PINB1);
 	
 	// If the button is held during startup, enter config mode.
 	uint16_t buttonHeldTime = 0;
@@ -108,12 +114,12 @@ int main(void) {
 }
 
 ISR(PCINT1_vect) {
-	if (!triggerPulled && (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2))) {
+	if (!triggerPulled && triggerHeld()) {
 		triggerPulled = true;
 
 		uint16_t buttonHeldTime = 0;
 		delay_ms(PULL_DEBOUNCE);
-		while (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) {
+		while (triggerHeld()) {
 			delay_ms(1);
 			buttonHeldTime += 1;
 			
@@ -124,7 +130,7 @@ ISR(PCINT1_vect) {
 		configTriggerPulled(buttonHeldTime);
 	}
 
-	if (triggerPulled && !pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2)) {		
+	if (triggerPulled && triggerReleased()) {		
 		delay_ms(RELEASE_DEBOUNCE);
 		triggerPulled = false;
 	}

@@ -63,6 +63,7 @@ void setOutputPin(uint8_t pinNumber) {
 	}
 }
 
+/*
 void pinOutput(uint8_t pinNumber, uint8_t state) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		if (state == HIGH) {
@@ -78,6 +79,7 @@ void pinOutput(uint8_t pinNumber, uint8_t state) {
 		}
 	}
 }
+*/
 
 uint8_t pinHasInput(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
@@ -119,7 +121,9 @@ void loadPreset() {
 	// Default to full auto
 	// 0 = full auto
 	// 1 = three round burst
-	if (FIRING_MODE < 0 || FIRING_MODE > 2) {
+	// 2 = Auto Response
+	// 3 = Semi-Auto (single shot)
+	if (FIRING_MODE < 0 || FIRING_MODE > 3) {
 		FIRING_MODE = 0;
 	}
 
@@ -177,4 +181,28 @@ void redOn() {
 
 void greenOn() {
 	PORTA |= (1 << PINA2); // RED
+}
+
+void redSet(bool state) {
+	if (state) {
+		redOn();
+	} else {
+		redOff();
+	}
+}
+
+void greenSet(bool state) {
+	if (state) {
+		greenOn();
+	} else {
+		greenOff();
+	}
+}
+
+void solenoidOn() {
+	PORTA |= (1 << PINA4);
+}
+
+void solenoidOff() {
+	PORTA &= ~(1 << PINA4);
 }

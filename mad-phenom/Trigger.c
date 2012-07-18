@@ -14,12 +14,23 @@ char trigger_roundsFired = 0;
 bool trigger_pulled = false;
 bool trigger_burstComplete = true;
 
+void trigger_singleShot(uint32_t *millis);
 void trigger_fullAuto(uint32_t *millis);
 void trigger_autoResponse(uint32_t *millis);
 void trigger_burst(uint32_t *millis);
 void trigger_roundComplete();
 
 void (*fireMethod)(uint32_t *millis) = &trigger_fullAuto;
+
+bool triggerHeld() {
+	return ((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0);
+	//return (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2));
+}
+
+bool triggerReleased() {
+	return ((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0);
+	//return (!pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2));
+}
 
 void trigger_run(uint32_t *millis) {
 	fireMethod(millis);
@@ -37,15 +48,36 @@ void trigger_changeMode() {
 		fireMethod = &trigger_fullAuto;
 	} else if (FIRING_MODE == 1) {
 		fireMethod = &trigger_burst;
-	} else {
+	} else if (FIRING_MODE == 2) {
 		fireMethod = &trigger_autoResponse;
+	} else {
+		fireMethod = &trigger_singleShot;
 	}
+}
+
+void trigger_singleShot(uint32_t *millis) {
+
+	// Trigger Pulled
+	if (!trigger_pulled && triggerHeld()) {
+		
+		trigger_pulled = true;
+		trigger_activeTime = (*millis);
+		solenoid_reset();
+	}
+
+	// Trigger Release
+	if (trigger_pulled == true && triggerReleased() && (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
+
+		trigger_pulled = false;
+	}
+
+	solenoid_run(millis);
 }
 
 void trigger_fullAuto(uint32_t *millis) {
 
 	// Trigger Pulled
-	if (!trigger_pulled && (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2))) {
+	if (!trigger_pulled && triggerHeld()) {
 		
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
@@ -55,7 +87,7 @@ void trigger_fullAuto(uint32_t *millis) {
 
 	// Trigger Held
 	if (trigger_pulled == true &&
-		(pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) &&
+		triggerHeld() &&
 		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE) &&
 		(((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
 	
@@ -64,7 +96,7 @@ void trigger_fullAuto(uint32_t *millis) {
 	}
 
 	// Trigger Release
-	if (trigger_pulled == true && (!pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2)) && (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
+	if (trigger_pulled == true && triggerReleased() && (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
 
 		trigger_pulled = false;
 	}
@@ -76,7 +108,7 @@ void trigger_autoResponse(uint32_t *millis) {
 
 	// Trigger Pulled
 	if (!trigger_pulled && 
-		(pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) && 
+		triggerHeld() && 
 		(((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) {
 			
 		trigger_pulled = true;
@@ -87,7 +119,7 @@ void trigger_autoResponse(uint32_t *millis) {
 
 	// Trigger Release
 	if (trigger_pulled == true && 
-		(!pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2)) && 
+		triggerReleased() && 
 		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
 			
 		trigger_pulled = false;
@@ -103,7 +135,7 @@ void trigger_burst(uint32_t *millis) {
 
 	// Trigger Pulled
 	if (!trigger_pulled &&
-		(pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2)) &&
+		triggerHeld() &&
 		(((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) {
 		
 		trigger_pulled = true;
@@ -115,7 +147,7 @@ void trigger_burst(uint32_t *millis) {
 
 	// Trigger Release
 	if (trigger_pulled == true &&
-		(!pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2)) &&
+		triggerReleased() &&
 		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
 		
 		trigger_pulled = false;

@@ -10,8 +10,11 @@
 #define TRIGGER_H_
 
 #include <avr/io.h>
+#include <stdbool.h>
 
 void trigger_run(uint32_t *millisecond);
 void trigger_changeMode();
+bool triggerHeld();
+bool triggerReleased();
 
 #endif /* TRIGGER_H_ */

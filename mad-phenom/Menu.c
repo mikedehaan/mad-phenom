@@ -13,6 +13,7 @@
 		0 - Full Auto
 		1 - Three Round Burst
 		2 - Auto Response
+		3 - Semi-Auto (Single Shot)
 	1 - Firing Rate (Ball Per Second)
 		5 - 40
 	2 - Burst size
@@ -97,20 +98,21 @@ void mainMenu() {
 		if (currentMenu == 0) { // Firing Mode
 			state = !state;
 			
-			pinOutput(PIN_LED_RED, !state);
-			pinOutput(PIN_LED_GREEN, state);
+			redSet(!state);
+			greenSet(state);
+			//pinOutput(PIN_LED_RED, !state);
+			//pinOutput(PIN_LED_GREEN, state);
 						
 			delay_ms(100);
 		} else if (currentMenu == 1) { // Firing Rate
 			state = !state;
 			
 			redOff();
-			pinOutput(PIN_LED_GREEN, state);				
+			greenSet(state);
+			//pinOutput(PIN_LED_GREEN, state);				
 			
 			delay_ms(50);
 		} else if (currentMenu == 2) {  // Burst size
-			//pinOutput(PIN_LED_RED, LOW);
-			//pinOutput(PIN_LED_GREEN, LOW);
 			lightsOff();
 			
 			// Display as three blinks of red then pause and repeat
@@ -139,7 +141,7 @@ void mainMenu() {
 }
 
 void firingModeMenu() {
-	menuMax = 2;
+	menuMax = 3;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = FIRING_MODE;
 	bool state = LOW;
@@ -147,7 +149,8 @@ void firingModeMenu() {
 		if (currentMenu == 0) {
 			state = !state;
 			
-			pinOutput(PIN_LED_RED, state);
+			redSet(state);
+			//pinOutput(PIN_LED_RED, state);
 			greenOff();
 			
 			delay_ms(50);
@@ -189,10 +192,13 @@ void firingModeMenu() {
 			}
 		
 			delay_ms(1000);
+		} else if (currentMenu == 3) { // Auto Response
+			redOff();
+			greenOn();
 		}
 	}
 	
-	if (selectedMenu >= 0 && selectedMenu <= 2) {
+	if (selectedMenu >= 0 && selectedMenu <= 3) {
 		eeprom_write_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET], selectedMenu);
 		successBlink();
 	} else {
@@ -279,7 +285,8 @@ void getNumberFromUser(uint8_t currentNumber, uint8_t max) {
 			state = !state;
 			
 			redOff();
-			pinOutput(PIN_LED_GREEN, state);
+			greenSet(state);
+			//pinOutput(PIN_LED_GREEN, state);
 			
 			delay_ms(200);
 			

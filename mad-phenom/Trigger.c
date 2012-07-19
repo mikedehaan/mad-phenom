@@ -10,7 +10,7 @@
 #include "Solenoid.h"
 
 uint32_t trigger_activeTime = 0;
-char trigger_roundsFired = 0;
+uint8_t trigger_roundsFired = 0;
 bool trigger_pulled = false;
 bool trigger_burstComplete = true;
 
@@ -36,6 +36,14 @@ void trigger_run(uint32_t *millis) {
 	fireMethod(millis);
 }
 
+bool checkPullDebounce(uint32_t *millis) {
+	return (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE);
+}
+
+bool checkReleaseDebounce(uint32_t *millis) {
+	return (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE);
+}
+
 void trigger_changeMode() {
 	// Stop any active firing
 	trigger_burstComplete = true;
@@ -58,7 +66,9 @@ void trigger_changeMode() {
 void trigger_singleShot(uint32_t *millis) {
 
 	// Trigger Pulled
-	if (!trigger_pulled && triggerHeld()) {
+	if (!trigger_pulled &&
+		triggerHeld() &&
+		checkReleaseDebounce(millis)) {
 		
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
@@ -66,9 +76,10 @@ void trigger_singleShot(uint32_t *millis) {
 	}
 
 	// Trigger Release
-	if (trigger_pulled == true && triggerReleased() && (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
+	if (trigger_pulled == true && triggerReleased() && checkPullDebounce(millis)) {
 
 		trigger_pulled = false;
+		trigger_activeTime = (*millis);
 	}
 
 	solenoid_run(millis);
@@ -77,8 +88,10 @@ void trigger_singleShot(uint32_t *millis) {
 void trigger_fullAuto(uint32_t *millis) {
 
 	// Trigger Pulled
-	if (!trigger_pulled && triggerHeld()) {
-		
+	if (!trigger_pulled && 
+		triggerHeld() &&
+		checkReleaseDebounce(millis)) {
+
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
 		trigger_burstComplete = false;
@@ -88,7 +101,7 @@ void trigger_fullAuto(uint32_t *millis) {
 	// Trigger Held
 	if (trigger_pulled == true &&
 		triggerHeld() &&
-		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE) &&
+		checkPullDebounce(millis) &&
 		(((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
 	
 		trigger_activeTime = (*millis);	
@@ -96,8 +109,7 @@ void trigger_fullAuto(uint32_t *millis) {
 	}
 
 	// Trigger Release
-	if (trigger_pulled == true && triggerReleased() && (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
-
+	if (trigger_pulled && triggerReleased() && checkPullDebounce(millis)) {
 		trigger_pulled = false;
 	}
 
@@ -109,7 +121,7 @@ void trigger_autoResponse(uint32_t *millis) {
 	// Trigger Pulled
 	if (!trigger_pulled && 
 		triggerHeld() && 
-		(((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) {
+		checkReleaseDebounce(millis)) {
 			
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
@@ -120,7 +132,7 @@ void trigger_autoResponse(uint32_t *millis) {
 	// Trigger Release
 	if (trigger_pulled == true && 
 		triggerReleased() && 
-		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
+		checkPullDebounce(millis)) {
 			
 		trigger_pulled = false;
 		trigger_activeTime = (*millis);
@@ -136,7 +148,7 @@ void trigger_burst(uint32_t *millis) {
 	// Trigger Pulled
 	if (!trigger_pulled &&
 		triggerHeld() &&
-		(((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) {
+		checkPullDebounce(millis)) {
 		
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
@@ -148,7 +160,7 @@ void trigger_burst(uint32_t *millis) {
 	// Trigger Release
 	if (trigger_pulled == true &&
 		triggerReleased() &&
-		(((*millis) - trigger_activeTime) >= PULL_DEBOUNCE)) {
+		checkPullDebounce(millis)) {
 		
 		trigger_pulled = false;
 		trigger_activeTime = (*millis);

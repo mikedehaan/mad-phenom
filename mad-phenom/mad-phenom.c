@@ -44,10 +44,18 @@ int main(void) {
 	setOutputPin(PIN_LED_RED);
 	setOutputPin(PIN_LED_GREEN);
 	setOutputPin(PIN_SOLENOID);
+	//DDRA |= (1 << PINA0); // DEBUG PIN
+	//DDRA |= (1 << PINA3); // DEBUG PIN
 
 	setInputPin(TRIGGER_PIN_1);
 	setInputPin(TRIGGER_PIN_2);
 	setInputPin(PIN_PUSHBUTTON); // Push button	
+	
+	// Other unknown pins
+	PORTA |= (1 << PINA0); // 13 - HIGH
+	PORTA |= (1 << PINA3); // 10 - HIGH
+	PORTA &= ~(1 << PINA4);	// 9 - LOW
+	PORTA &= ~(1 << PINA5);	// 8 - LOW
 	
 	// Set Triggers HIGH
 	//pinOutput(TRIGGER_PIN_1, HIGH);
@@ -104,11 +112,11 @@ int main(void) {
 		
 		handleConfig();	
 	} else { // Normal run mode
-		while(1) {
+		for (;;) {
 			// This prevents time from changing within an iteration
-			uint32_t millisCopy = millis;
-			trigger_run(&millisCopy);
-			pushbutton_run(&millisCopy);
+			//uint32_t millisCopy = millis;
+			trigger_run(&millis);
+			pushbutton_run(&millis);
 		}
 	}		
 }

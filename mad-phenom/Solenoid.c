@@ -30,7 +30,9 @@ void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFun
 	}
 	
 	if (!solenoidActive) {  // Activate the Solenoid
-		shotsFired++;
+		if (shotsFired < 255) {
+			shotsFired++;
+		}		
 		//pinOutput(PIN_SOLENOID, HIGH);
 		solenoidOn();
 		activeTime = (*millis);

@@ -167,6 +167,14 @@ void togglePreset(){
 	loadPreset();
 }
 
+void debugOn() {
+	PORTA |= (1 << PINA0);
+}
+
+void debugOff() {
+	PORTA &= ~(1 << PINA0);
+}
+
 void redOff() {
 	PORTA &= ~(1 << PINA1); // RED
 }
@@ -200,9 +208,9 @@ void greenSet(bool state) {
 }
 
 void solenoidOn() {
-	PORTA |= (1 << PINA4);
+	PORTA |= (1 << PINA7);
 }
 
 void solenoidOff() {
-	PORTA &= ~(1 << PINA4);
+	PORTA &= ~(1 << PINA7);
 }

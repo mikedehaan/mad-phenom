@@ -25,6 +25,8 @@ uint8_t pinHasInput(uint8_t pinNumber);
 void initialize();
 void togglePreset();
 
+void debugOn();
+void debugOff();
 void redOff();
 void greenOff();
 void redOn();

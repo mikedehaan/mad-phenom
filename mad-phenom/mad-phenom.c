@@ -34,14 +34,6 @@ ISR(TIM0_COMPA_vect) {
 
 int main(void) {
 
-	// Disable the watchdog to prevent random chip resets
-	/* Clear WDRF in MCUSR */
-	MCUSR = 0x00;
-	/* Write logical one to WDCE and WDE */
-	WDTCSR |= (1<<WDCE) | (1<<WDE);
-	/* Turn off WDT */
-	WDTCSR = 0x00;
-
 	TCCR0B |= (1 << CS01);  // Enable timer with 1/8th prescale
 	TIMSK0 |= 1 << OCIE0A; // Configure Timer0 for Compare Match
 	OCR0A = 255; // Match at 200
@@ -61,10 +53,10 @@ int main(void) {
 	setInputPin(PIN_PUSHBUTTON); // Push button	
 	
 	// Other unknown pins
-	PORTA |= (1 << PINA0); // 13 - HIGH
-	PORTA |= (1 << PINA3); // 10 - HIGH
-	PORTA &= ~(1 << PINA4);	// 9 - LOW
-	PORTA &= ~(1 << PINA5);	// 8 - LOW
+	//PORTA |= (1 << PINA0); // 13 - HIGH
+	//PORTA |= (1 << PINA3); // 10 - HIGH
+	//PORTA &= ~(1 << PINA4);	// 9 - LOW
+	//PORTA &= ~(1 << PINA5);	// 8 - LOW
 	
 	// Set Triggers HIGH
 	//pinOutput(TRIGGER_PIN_1, HIGH);
@@ -79,7 +71,7 @@ int main(void) {
 	// If the button is held during startup, enter config mode.
 	uint16_t buttonHeldTime = 0;
 	bool configMode = false;
-	while (pinHasInput(3)) {
+	while (pushButtonHasInput()) {
 		delay_ms(1);
 		
 		buttonHeldTime++;
@@ -94,24 +86,7 @@ int main(void) {
 		// Some firing modes have 0 PULL_DEBOUNCE
 		// Reset so the menus work.
 		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-	}	
-	
-	/*
-	// If the button is held during startup, enter config mode.
-	uint32_t buttonHeldTime = millis;
-	while (pinHasInput(3)) {
-		// don't do anything
 	}
-	
-	bool configMode = false;
-	if ((millis - buttonHeldTime) >= 1000) {
-		configMode = true;
-			
-		// Some firing modes have 0 PULL_DEBOUNCE
-		// Reset so the menus work.
-		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
-	}
-	*/
 	
 	if (configMode) {
 		// Initialize interrupts for the menu system

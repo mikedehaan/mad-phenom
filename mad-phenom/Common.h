@@ -35,4 +35,6 @@ void redSet(bool state);
 void greenSet(bool state);
 void solenoidOn();
 void solenoidOff();
+bool pushButtonHasInput();
+
 #endif /* COMMON_H_ */

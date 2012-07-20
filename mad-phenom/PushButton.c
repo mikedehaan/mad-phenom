@@ -18,7 +18,7 @@ bool pushbutton_indicatorOn = false;
 void pushbutton_run(volatile uint32_t *millis) {
 	
 	// Check if the push button was pushed
-	if (!pushbutton_down && pinHasInput(PIN_PUSHBUTTON) && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
+	if (!pushbutton_down && pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
 		pushbutton_down = true;
 		redOn();
 		pushbutton_activeTime = (*millis);
@@ -32,7 +32,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 	}
 	
 	// Has the pushbutton been released?
-	if (pushbutton_down && !pinHasInput(PIN_PUSHBUTTON) && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
+	if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
 		pushbutton_down = false;
 		pushbutton_activeTime = (*millis);
 		redOff();

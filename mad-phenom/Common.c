@@ -1,6 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
+#include <stdbool.h>
 #define F_CPU 8000000UL
 #include <util/delay.h>
 #include "Common.h"
@@ -213,4 +214,8 @@ void solenoidOn() {
 
 void solenoidOff() {
 	PORTA &= ~(1 << PINA7);
+}
+
+bool pushButtonHasInput() {
+	return (PINB & (1 << PINB1)) <= 0;
 }

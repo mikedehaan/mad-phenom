@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
+#include <avr/wdt.h>
 #include <stdbool.h>
 
 #include "Globals.h"
@@ -32,6 +33,14 @@ ISR(TIM0_COMPA_vect) {
 }
 
 int main(void) {
+
+	// Disable the watchdog to prevent random chip resets
+	/* Clear WDRF in MCUSR */
+	MCUSR = 0x00;
+	/* Write logical one to WDCE and WDE */
+	WDTCSR |= (1<<WDCE) | (1<<WDE);
+	/* Turn off WDT */
+	WDTCSR = 0x00;
 
 	TCCR0B |= (1 << CS01);  // Enable timer with 1/8th prescale
 	TIMSK0 |= 1 << OCIE0A; // Configure Timer0 for Compare Match

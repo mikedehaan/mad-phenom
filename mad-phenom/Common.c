@@ -116,7 +116,6 @@ void loadPreset() {
 	
 	// Cutting this in down since I think the tippmann default is for trigger pull and release.
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
-	PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
 	
 	// Default to full auto

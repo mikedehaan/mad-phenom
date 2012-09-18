@@ -13,6 +13,8 @@
 #define PIN_SOLENOID 6
 #define PIN_PUSHBUTTON 3
 
+#define PULL_DEBOUNCE 20
+
 extern uint8_t CURRENT_PRESET;
 
 extern uint8_t EEMEM EEPROM_BALLS_PER_SECOND_1;
@@ -43,7 +45,6 @@ extern uint8_t BURST_SIZE;
 extern uint8_t AMMO_LIMIT;
 
 extern uint8_t ROUND_DELAY; // delay between shots in ms
-extern uint8_t PULL_DEBOUNCE;  // Debounce in ms
 extern uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 extern uint8_t DWELL;
 

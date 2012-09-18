@@ -31,7 +31,6 @@ uint8_t BURST_SIZE;
 uint8_t AMMO_LIMIT;
 
 uint8_t ROUND_DELAY; // delay between shots in ms
-uint8_t PULL_DEBOUNCE;  // Debounce in ms
 uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 uint8_t DWELL;
 

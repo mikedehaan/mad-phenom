@@ -28,15 +28,16 @@ void pushbutton_run(volatile uint32_t *millis) {
 		greenOff();
 	}
 	
-	// Has the pushbutton been released? ()
-	if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > 200) {
+    // Has the pushbutton been released? ()
+    if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
+        if (((*millis) - pushbutton_activeTime) > 200) {
+            togglePreset();
+        }
 
-		togglePreset();
-
-		pushbutton_down       = false;
-		pushbutton_activeTime = (*millis);
-		redOff();
-	}
+        pushbutton_down       = false;
+        pushbutton_activeTime = (*millis);
+        redOff();
+    }
 	
 	// This code will turn the green LED on and off to signify which preset is active
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 200 && pushbutton_currentBlink != (CURRENT_PRESET + 1)) {

@@ -12,7 +12,7 @@
 #include <avr/io.h>
 #include <stdbool.h>
 
-void trigger_run(uint32_t *millisecond);
+void trigger_run(volatile uint32_t *millisecond);
 void trigger_changeMode();
 bool triggerHeld();
 bool triggerReleased();

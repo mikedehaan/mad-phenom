@@ -82,10 +82,6 @@ int main(void) {
 	
 	if (buttonHeldTime >= 1000) {
 		configMode = true;
-		
-		// Some firing modes have 0 PULL_DEBOUNCE
-		// Reset so the menus work.
-		PULL_DEBOUNCE = RELEASE_DEBOUNCE;
 	}
 	
 	if (configMode) {

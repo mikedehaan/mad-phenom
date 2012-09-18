@@ -21,19 +21,19 @@ void pushbutton_run(volatile uint32_t *millis) {
 	if (!pushbutton_down && pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
 		pushbutton_down = true;
 		redOn();
-		pushbutton_activeTime = (*millis);
-		
-		togglePreset();
-		
-		pushbutton_currentBlink = 0;
-		pushbutton_indicatorOn = false;
+		pushbutton_activeTime    = (*millis);		
+		pushbutton_currentBlink  = 0;
+		pushbutton_indicatorOn   = false;
 		pushbutton_indicatorTime = (*millis);
 		greenOff();
 	}
 	
-	// Has the pushbutton been released?
-	if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
-		pushbutton_down = false;
+	// Has the pushbutton been released? ()
+	if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > 200) {
+
+		togglePreset();
+
+		pushbutton_down       = false;
 		pushbutton_activeTime = (*millis);
 		redOff();
 	}

@@ -10,26 +10,24 @@
 #include "Solenoid.h"
 
 uint32_t trigger_activeTime = 0;
-uint8_t trigger_roundsFired = 0;
+uint32_t queue_activeTime = 0;
 bool trigger_pulled = false;
-bool trigger_burstComplete = true;
+uint8_t firing_queue = 0;
 
 void trigger_singleShot(uint32_t *millis);
 void trigger_fullAuto(uint32_t *millis);
 void trigger_autoResponse(uint32_t *millis);
 void trigger_burst(uint32_t *millis);
-void trigger_roundComplete();
+void fireFromQueue(uint32_t *millis);
 
 void (*fireMethod)(uint32_t *millis) = &trigger_fullAuto;
 
 bool triggerHeld() {
 	return ((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0);
-	//return (pinHasInput(TRIGGER_PIN_1) || pinHasInput(TRIGGER_PIN_2));
 }
 
 bool triggerReleased() {
 	return ((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0);
-	//return (!pinHasInput(TRIGGER_PIN_1) && !pinHasInput(TRIGGER_PIN_2));
 }
 
 void trigger_run(uint32_t *millis) {
@@ -46,7 +44,6 @@ bool checkReleaseDebounce(uint32_t *millis) {
 
 void trigger_changeMode() {
 	// Stop any active firing
-	trigger_burstComplete = true;
 	trigger_pulled = false;
 	
 	// 0 - Full Auto
@@ -72,7 +69,7 @@ void trigger_singleShot(uint32_t *millis) {
 		
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
-		solenoid_reset();
+		firing_queue = 1;
 	}
 
 	// Trigger Release
@@ -82,7 +79,8 @@ void trigger_singleShot(uint32_t *millis) {
 		trigger_activeTime = (*millis);
 	}
 
-	solenoid_run(millis);
+
+	fireFromQueue(millis);
 }
 
 void trigger_fullAuto(uint32_t *millis) {
@@ -94,8 +92,7 @@ void trigger_fullAuto(uint32_t *millis) {
 
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
-		trigger_burstComplete = false;
-		solenoid_reset();
+		firing_queue = 1;
 	}
 
 	// Trigger Held
@@ -105,7 +102,7 @@ void trigger_fullAuto(uint32_t *millis) {
 		(((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
 	
 		trigger_activeTime = (*millis);	
-		solenoid_reset();
+		firing_queue = 1;
 	}
 
 	// Trigger Release
@@ -113,7 +110,7 @@ void trigger_fullAuto(uint32_t *millis) {
 		trigger_pulled = false;
 	}
 
-	solenoid_run(millis);
+	fireFromQueue(millis);
 }
 
 void trigger_autoResponse(uint32_t *millis) {
@@ -125,8 +122,7 @@ void trigger_autoResponse(uint32_t *millis) {
 			
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
-		solenoid_reset();
-		solenoid_run(millis);
+		firing_queue++;
 	}
 
 	// Trigger Release
@@ -136,11 +132,14 @@ void trigger_autoResponse(uint32_t *millis) {
 			
 		trigger_pulled = false;
 		trigger_activeTime = (*millis);
-		
-		solenoid_reset();
+		firing_queue++;
 	}
 
-	solenoid_run(millis);
+	if (firing_queue > 2) {
+		firing_queue = 2;
+	}
+
+	fireFromQueue(millis);
 }
 
 void trigger_burst(uint32_t *millis) {
@@ -152,9 +151,7 @@ void trigger_burst(uint32_t *millis) {
 		
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
-		trigger_burstComplete = false;
-		trigger_roundsFired = 0;
-		solenoid_reset();
+		firing_queue = BURST_SIZE;
 	}
 
 	// Trigger Release
@@ -166,19 +163,26 @@ void trigger_burst(uint32_t *millis) {
 		trigger_activeTime = (*millis);
 	}
 
-	if (!trigger_burstComplete && 
-		(((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
-
-		trigger_activeTime = (*millis);
-		solenoid_reset();
-	}
-
-	solenoid_run_callback(millis, &trigger_roundComplete);
+	fireFromQueue(millis);
 }
 
-void trigger_roundComplete() {
-	trigger_roundsFired++;
-	if (trigger_roundsFired == BURST_SIZE) {
-		trigger_burstComplete = true;
+
+// Semi Auto, set queue to 1
+// Full Auto, while the trigger is pulled, set queue to 1
+// round burst, set queue to BURST_SIZE
+// Auto-response, set queue to 1 on trigger pull and again on release
+
+void fireFromQueue(uint32_t *millis) {
+	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
+		// decrement the queue
+		firing_queue--;
+		
+		// Fire a round
+		solenoid_reset();
+		
+		// Reset the trigger active time
+		queue_activeTime = (*millis);
 	}
+	
+	solenoid_run(millis);
 }

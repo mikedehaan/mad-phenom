@@ -176,13 +176,13 @@ void fireFromQueue(uint32_t *millis) {
 	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
 		// decrement the queue
 		firing_queue--;
-		
+
 		// Fire a round
 		solenoid_reset();
-		
+
 		// Reset the trigger active time
 		queue_activeTime = (*millis);
 	}
-	
+
 	solenoid_run(millis);
 }

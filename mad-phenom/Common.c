@@ -1,3 +1,19 @@
+/*
+This file is part of mad-phenom.
+
+mad-phenom is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+mad-phenom is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
@@ -17,88 +33,6 @@ void delay_ms(uint16_t ms){
 		_delay_ms(1);
 	}
 }
-
-/*
-uint8_t getPinMask(uint8_t pinNumber) {
-	if (pinNumber == 2) {
-		return (1 << PINB0);
-	} else if (pinNumber == 3) {
-		return (1 << PINB1);
-	} else if (pinNumber == 4) {
-		return (1 << PINB3);
-	} else if (pinNumber == 5) {
-		return (1 << PINB2);
-	} else if (pinNumber == 6) {
-		return (1 << PINA7);
-	} else if (pinNumber == 7) {
-		return (1 << PINA6);
-	} else if (pinNumber == 8) {
-		return (1 << PINA5);
-	} else if (pinNumber == 9) {
-		return (1 << PINA4);
-	} else if (pinNumber == 10) {
-		return (1 << PINA3);
-	} else if (pinNumber == 11) {
-		return (1 << PINA2);
-	} else if (pinNumber == 12) {
-		return (1 << PINA1);
-	} else if (pinNumber == 13) {
-		return (1 << PINA0);
-	}
-	
-	return 0;
-}
-*/
-
-/*
-void setInputPin(uint8_t pinNumber) {
-	if (pinNumber >= 2 && pinNumber <= 5) {
-		DDRB &= ~(getPinMask(pinNumber));
-	} else if (pinNumber >=6 && pinNumber <= 13) {
-		DDRA &= ~(getPinMask(pinNumber));
-	}
-}
-*/
-
-/*
-void setOutputPin(uint8_t pinNumber) {
-	if (pinNumber >= 2 && pinNumber <= 5) {
-		DDRB |= (getPinMask(pinNumber));
-	} else if (pinNumber >= 6 && pinNumber <= 13) {
-		DDRA |= (getPinMask(pinNumber));
-	}
-}
-*/
-
-/*
-void pinOutput(uint8_t pinNumber, uint8_t state) {
-	if (pinNumber >= 2 && pinNumber <= 5) {
-		if (state == HIGH) {
-			PORTB |= (getPinMask(pinNumber));
-		} else {
-			PORTB &= ~(getPinMask(pinNumber));
-		}
-	} else if (pinNumber >= 6 && pinNumber <= 13) {
-		if (state == HIGH) {
-			PORTA |= (getPinMask(pinNumber));
-		} else {
-			PORTA &= ~(getPinMask(pinNumber));
-		}
-	}
-}
-*/
-
-/*
-uint8_t pinHasInput(uint8_t pinNumber) {
-	if (pinNumber >= 2 && pinNumber <= 5) {
-		return (PINB & (getPinMask(pinNumber))) <= 0;
-	} else if (pinNumber >= 6 && pinNumber <= 13) {
-		return (PINA & (getPinMask(pinNumber))) <= 0;
-	} else {
-		return 0;
-	}
-}
-*/
 
 void loadPreset() {
 	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET]);
@@ -179,18 +113,6 @@ void togglePreset(){
 	
 	loadPreset();
 }
-
-/*
-void debugOn() {
-	PORTA |= (1 << PINA0);
-}
-*/
-
-/*
-void debugOff() {
-	PORTA &= ~(1 << PINA0);
-}
-*/
 
 void redOff() {
 	PORTA &= ~(1 << PINA1); // RED

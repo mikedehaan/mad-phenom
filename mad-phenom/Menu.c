@@ -1,3 +1,19 @@
+/*
+This file is part of mad-phenom.
+
+mad-phenom is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+mad-phenom is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include <stdbool.h>
 #include "Globals.h"
 #include "Common.h"
@@ -27,19 +43,6 @@ volatile uint8_t selectedMenu = NOT_SELECTED;
 
 void getNumberFromUser(uint8_t currentNumber, uint8_t max);
 
-/*
-void setLedState(bool redOn, bool greenOn) {
-	pinOutput(PIN_LED_RED, (redOn ? HIGH : LOW));
-	pinOutput(PIN_LED_GREEN, (greenOn ? HIGH : LOW));	
-}
-*/
-/*
-void ledWithDelay(uint8_t led1, bool led1State, uint16_t delay, uint8_t led2, bool led2State) {
-	pinOutput(led1, led1State);
-	delay_ms(delay);
-	pinOutput(led2, led2State);
-}
-*/
 void lightsOff() {
 	PORTA &= ~(1 << PINA2); // GREEN
 	PORTA &= ~(1 << PINA1); // RED
@@ -100,8 +103,6 @@ void mainMenu() {
 			
 			redSet(!state);
 			greenSet(state);
-			//pinOutput(PIN_LED_RED, !state);
-			//pinOutput(PIN_LED_GREEN, state);
 						
 			delay_ms(100);
 		} else if (currentMenu == 1) { // Firing Rate (fast green blink)
@@ -109,7 +110,6 @@ void mainMenu() {
 			
 			redOff();
 			greenSet(state);
-			//pinOutput(PIN_LED_GREEN, state);				
 			
 			delay_ms(50);
 		} else if (currentMenu == 2) {  // Burst size (three red blinks)
@@ -153,13 +153,10 @@ void firingModeMenu() {
 			state = !state;
 			
 			redSet(state);
-			//pinOutput(PIN_LED_RED, state);
 			greenOff();
 			
 			delay_ms(50);
 		} else if (currentMenu == 1) { // Three Round Burst
-			//pinOutput(PIN_LED_RED, LOW);
-			//pinOutput(PIN_LED_GREEN, LOW);
 			lightsOff();
 			
 			// Display as three blinks of green then pause and repeat
@@ -302,7 +299,6 @@ void getNumberFromUser(uint8_t currentNumber, uint8_t max) {
 			
 			redOff();
 			greenSet(state);
-			//pinOutput(PIN_LED_GREEN, state);
 			
 			delay_ms(200);
 			
@@ -311,8 +307,6 @@ void getNumberFromUser(uint8_t currentNumber, uint8_t max) {
 				delay_ms(1000);
 			}
 		} else {
-			//pinOutput(PIN_LED_RED, LOW);
-			//pinOutput(PIN_LED_GREEN, LOW);
 			lightsOff();
 		}
 	}

@@ -1,10 +1,19 @@
 /*
- * mad_phenom.c
- *
- * Created: 7/15/2012 3:52:15 PM
- *  Author: mike
- */ 
+This file is part of mad-phenom.
 
+mad-phenom is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+mad-phenom is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
@@ -46,20 +55,10 @@ int main(void) {
 	DDRA |= (1 << PINA2); // Pin 11 - Green LED
 	DDRA |= (1 << PINA7); // Pin 6  - Solenoid
 	
-	//setOutputPin(1 << PINA1);	// 12
-	//setOutputPin(1 << PINA2);	// 11
-	//setOutputPin(1 << PINA7);	// 6
-	//DDRA |= (1 << PINA0); // DEBUG PIN
-	//DDRA |= (1 << PINA3); // DEBUG PIN
-
 	DDRB &= ~(1 << PINB1); // Pin 3 - Push button
 	DDRB &= ~(1 << PINB2); // Pin 5 - Trigger Pin 1
 	DDRA &= ~(1 << PINA6); // Pin 7 - Trigger Pin 2
 
-//	setInputPin(TRIGGER_PIN_1);
-//	setInputPin(TRIGGER_PIN_2);
-//	setInputPin(PIN_PUSHBUTTON); // Push button	
-	
 	// Other unknown pins
 	//PORTA |= (1 << PINA0); // 13 - HIGH
 	//PORTA |= (1 << PINA3); // 10 - HIGH
@@ -67,13 +66,10 @@ int main(void) {
 	//PORTA &= ~(1 << PINA5);	// 8 - LOW
 	
 	// Set Triggers HIGH
-	//pinOutput(TRIGGER_PIN_1, HIGH);
-	//pinOutput(TRIGGER_PIN_2, HIGH);
 	PORTB |= (1 << PINB2);
 	PORTA |= (1 << PINA6);
 	
 	// Set Pushbutton HIGH
-	//pinOutput(PIN_PUSHBUTTON, HIGH);
 	PORTB |= (1 << PINB1);
 	
 	// If the button is held during startup, enter config mode.
@@ -102,7 +98,6 @@ int main(void) {
 	} else { // Normal run mode
 		for (;;) {
 			// This prevents time from changing within an iteration
-			//uint32_t millisCopy = millis;
 			trigger_run(&millis);
 			pushbutton_run(&millis);
 		}

@@ -106,7 +106,9 @@ void trigger_fullAuto(uint32_t *millis) {
 		trigger_activeTime = (*millis);
 		
 		// Don't allow FA if safety shots have not been reached
-		if (safetyShotsFired >= SAFETY_SHOT || SAFETY_SHOT == 0) {
+		// FA needs to be greater than the safety shot
+		// since holding the trigger would auto-qualify the last safety shot.
+		if (safetyShotsFired > SAFETY_SHOT || SAFETY_SHOT == 0) {
 			firing_queue = 1;
 		}			
 	}
@@ -114,6 +116,7 @@ void trigger_fullAuto(uint32_t *millis) {
 	// Trigger Release
 	if (trigger_pulled && triggerReleased() && checkPullDebounce(millis)) {
 		trigger_pulled = false;
+		trigger_activeTime = (*millis);
 	}
 
 	fireFromQueue(millis);
@@ -190,6 +193,18 @@ void trigger_burst(uint32_t *millis) {
 
 void fireFromQueue(uint32_t *millis) {
 	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
+		
+		lastTriggerPullTime = (*millis);
+
+		safetyShotsFired++;
+
+		uint8_t safetyMax = SAFETY_SHOT + 1;
+
+		// This is a safety to prevent integer overflow (adding 1 for FA)
+		if (safetyShotsFired > (safetyMax)) {
+			safetyShotsFired = safetyMax;
+		}
+
 		// decrement the queue
 		firing_queue--;
 
@@ -199,18 +214,11 @@ void fireFromQueue(uint32_t *millis) {
 		// Reset the trigger active time
 		queue_activeTime = (*millis);
 		
-		// If the ball was fired within a second, increment safety shots fired
-		if ((*millis) - lastTriggerPullTime <= 1000) {
-			safetyShotsFired++;
-			
-			if (safetyShotsFired >= SAFETY_SHOT) {
-				safetyShotsFired = SAFETY_SHOT;
-			}
-		} else {
-			safetyShotsFired = 0;
-		}
-		
-		lastTriggerPullTime = (*millis);	
+	}
+
+	// If the ball was fired within a second, increment safety shots fired
+	if ((*millis) - lastTriggerPullTime > 1000) {
+		safetyShotsFired = 0;
 	}
 
 	solenoid_run(millis);

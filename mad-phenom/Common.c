@@ -105,6 +105,7 @@ void loadPreset() {
 	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET]);
 	BURST_SIZE = eeprom_read_byte(&EEPROM_BURST_SIZE[CURRENT_PRESET]);
 	AMMO_LIMIT = eeprom_read_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET]);
+	SAFETY_SHOT = eeprom_read_byte(&EEPROM_SAFETY_SHOT[CURRENT_PRESET]);
 	
 	// If the data is invalid, use default values
 	if (BALLS_PER_SECOND < 5 || BALLS_PER_SECOND > 40) {
@@ -118,6 +119,10 @@ void loadPreset() {
 	
 	if (AMMO_LIMIT > 250) {
 		AMMO_LIMIT = 0;
+	}
+	
+	if (SAFETY_SHOT < 0 || SAFETY_SHOT > 5) {
+		SAFETY_SHOT = 0;
 	}
 	
 	DWELL = 8;

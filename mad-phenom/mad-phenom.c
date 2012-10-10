@@ -42,15 +42,23 @@ int main(void) {
 	
 	initialize();
 	
-	setOutputPin(PIN_LED_RED);
-	setOutputPin(PIN_LED_GREEN);
-	setOutputPin(PIN_SOLENOID);
+	DDRA |= (1 << PINA1); // Pin 12 - Red LED
+	DDRA |= (1 << PINA2); // Pin 11 - Green LED
+	DDRA |= (1 << PINA7); // Pin 6  - Solenoid
+	
+	//setOutputPin(1 << PINA1);	// 12
+	//setOutputPin(1 << PINA2);	// 11
+	//setOutputPin(1 << PINA7);	// 6
 	//DDRA |= (1 << PINA0); // DEBUG PIN
 	//DDRA |= (1 << PINA3); // DEBUG PIN
 
-	setInputPin(TRIGGER_PIN_1);
-	setInputPin(TRIGGER_PIN_2);
-	setInputPin(PIN_PUSHBUTTON); // Push button	
+	DDRB &= ~(1 << PINB1); // Pin 3 - Push button
+	DDRB &= ~(1 << PINB2); // Pin 5 - Trigger Pin 1
+	DDRA &= ~(1 << PINA6); // Pin 7 - Trigger Pin 2
+
+//	setInputPin(TRIGGER_PIN_1);
+//	setInputPin(TRIGGER_PIN_2);
+//	setInputPin(PIN_PUSHBUTTON); // Push button	
 	
 	// Other unknown pins
 	//PORTA |= (1 << PINA0); // 13 - HIGH

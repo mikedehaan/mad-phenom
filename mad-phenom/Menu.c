@@ -90,12 +90,12 @@ void presetMenu() {
 }
 
 void mainMenu() {
-	menuMax = 3;
+	menuMax = 4;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
 	bool state = false;
 	while(selectedMenu == NOT_SELECTED) {
-		if (currentMenu == 0) { // Firing Mode
+		if (currentMenu == 0) { // Firing Mode (toggle green then red)
 			state = !state;
 			
 			redSet(!state);
@@ -104,7 +104,7 @@ void mainMenu() {
 			//pinOutput(PIN_LED_GREEN, state);
 						
 			delay_ms(100);
-		} else if (currentMenu == 1) { // Firing Rate
+		} else if (currentMenu == 1) { // Firing Rate (fast green blink)
 			state = !state;
 			
 			redOff();
@@ -112,7 +112,7 @@ void mainMenu() {
 			//pinOutput(PIN_LED_GREEN, state);				
 			
 			delay_ms(50);
-		} else if (currentMenu == 2) {  // Burst size
+		} else if (currentMenu == 2) {  // Burst size (three red blinks)
 			lightsOff();
 			
 			// Display as three blinks of red then pause and repeat
@@ -133,9 +133,12 @@ void mainMenu() {
 					delay_ms(100);
 				}
 			}
-		} else if (currentMenu == 3) {  // Ammo Limit
+		} else if (currentMenu == 3) {  // Ammo Limit (Solid Red)
 			redOn();
 			greenOff();
+		} else if (currentMenu == 4) {  // Safety Shot (Solid Green)
+			redOff();
+			greenOn();
 		}			
 	}
 }
@@ -207,12 +210,25 @@ void firingModeMenu() {
 }
 
 void ammoLimitMenu() {
-	 getNumberFromUser(AMMO_LIMIT, 250);
+	getNumberFromUser(AMMO_LIMIT, 250);
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 0 && selectedMenu <= 250) {
 		eeprom_write_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET], selectedMenu);
 		AMMO_LIMIT = selectedMenu;
+		successBlink();
+	} else {
+		failureBlink();
+	}
+}
+
+void safetyShotMenu() {
+	getNumberFromUser(SAFETY_SHOT, 5);
+	
+	// Burst size was entered into selectedMenu.  Verify it and save it.
+	if (selectedMenu >= 0 && selectedMenu <= 250) {
+		eeprom_write_byte(&EEPROM_SAFETY_SHOT[CURRENT_PRESET], selectedMenu);
+		SAFETY_SHOT = selectedMenu;
 		successBlink();
 	} else {
 		failureBlink();
@@ -318,6 +334,8 @@ void handleConfig() {
 			burstSizeMenu();
 		} else if (selectedMenu == 3) {
 			ammoLimitMenu();
+		} else if (selectedMenu == 4) {
+			safetyShotMenu();
 		}
 	}			
 }

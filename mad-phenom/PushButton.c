@@ -17,8 +17,10 @@ bool pushbutton_indicatorOn = false;
 
 void pushbutton_run(volatile uint32_t *millis) {
 	
+	bool pastDebounce = ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE;
+	
 	// Check if the push button was pushed
-	if (!pushbutton_down && pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
+	if (!pushbutton_down && pushButtonHasInput() && pastDebounce) {
 		pushbutton_down = true;
 		redOn();
 		pushbutton_activeTime    = (*millis);		
@@ -26,7 +28,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 	}
 	
     // Has the pushbutton been released? ()
-    if (pushbutton_down && !pushButtonHasInput() && ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE) {
+    if (pushbutton_down && !pushButtonHasInput() && pastDebounce) {
         if (((*millis) - pushbutton_activeTime) > 100) {
             togglePreset();
 			pushbutton_currentBlink = 0;

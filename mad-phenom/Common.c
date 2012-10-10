@@ -18,6 +18,7 @@ void delay_ms(uint16_t ms){
 	}
 }
 
+/*
 uint8_t getPinMask(uint8_t pinNumber) {
 	if (pinNumber == 2) {
 		return (1 << PINB0);
@@ -47,7 +48,9 @@ uint8_t getPinMask(uint8_t pinNumber) {
 	
 	return 0;
 }
+*/
 
+/*
 void setInputPin(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		DDRB &= ~(getPinMask(pinNumber));
@@ -55,7 +58,9 @@ void setInputPin(uint8_t pinNumber) {
 		DDRA &= ~(getPinMask(pinNumber));
 	}
 }
+*/
 
+/*
 void setOutputPin(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		DDRB |= (getPinMask(pinNumber));
@@ -63,6 +68,7 @@ void setOutputPin(uint8_t pinNumber) {
 		DDRA |= (getPinMask(pinNumber));
 	}
 }
+*/
 
 /*
 void pinOutput(uint8_t pinNumber, uint8_t state) {
@@ -82,6 +88,7 @@ void pinOutput(uint8_t pinNumber, uint8_t state) {
 }
 */
 
+/*
 uint8_t pinHasInput(uint8_t pinNumber) {
 	if (pinNumber >= 2 && pinNumber <= 5) {
 		return (PINB & (getPinMask(pinNumber))) <= 0;
@@ -91,12 +98,14 @@ uint8_t pinHasInput(uint8_t pinNumber) {
 		return 0;
 	}
 }
+*/
 
 void loadPreset() {
 	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET]);
 	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET]);
 	BURST_SIZE = eeprom_read_byte(&EEPROM_BURST_SIZE[CURRENT_PRESET]);
 	AMMO_LIMIT = eeprom_read_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET]);
+	SAFETY_SHOT = eeprom_read_byte(&EEPROM_SAFETY_SHOT[CURRENT_PRESET]);
 	
 	// If the data is invalid, use default values
 	if (BALLS_PER_SECOND < 5 || BALLS_PER_SECOND > 40) {
@@ -110,6 +119,10 @@ void loadPreset() {
 	
 	if (AMMO_LIMIT > 250) {
 		AMMO_LIMIT = 0;
+	}
+	
+	if (SAFETY_SHOT < 0 || SAFETY_SHOT > 5) {
+		SAFETY_SHOT = 0;
 	}
 	
 	DWELL = 8;
@@ -167,13 +180,17 @@ void togglePreset(){
 	loadPreset();
 }
 
+/*
 void debugOn() {
 	PORTA |= (1 << PINA0);
 }
+*/
 
+/*
 void debugOff() {
 	PORTA &= ~(1 << PINA0);
 }
+*/
 
 void redOff() {
 	PORTA &= ~(1 << PINA1); // RED

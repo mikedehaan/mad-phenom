@@ -24,10 +24,6 @@ bool solenoidActive = false;
 uint32_t activeTime = 0;
 
 void solenoid_run(volatile uint32_t *millis) {
-	solenoid_run_callback(millis, 0);
-}
-
-void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFunction)()) {
 	if (solenoidDone) {
 		return;
 	}
@@ -52,9 +48,6 @@ void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFun
 		solenoidOff();
 		solenoidDone = true;
 		solenoidActive = false;
-		if (solenoidCompleteFunction != 0) {
-			solenoidCompleteFunction();
-		}
 	}
 }
 

@@ -20,7 +20,6 @@ along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/io.h>
 
 void solenoid_run(volatile uint32_t *millis);
-void solenoid_run_callback(volatile uint32_t *millis, void (*solenoidCompleteFunction)());
 void solenoid_reset();
 
 #endif /* SOLENOID_H_ */

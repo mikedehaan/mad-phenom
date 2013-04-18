@@ -31,182 +31,39 @@ uint8_t firing_queue = 0;
 //void trigger_fullAuto(uint32_t *millis);
 //void trigger_autoResponse(uint32_t *millis);
 //void trigger_burst(uint32_t *millis);
-void fireFromQueue(uint32_t *millis);
-void trigger_action(uint32_t *millis);
+//void fireFromQueue(uint32_t *millis);
 
-void (*fireMethod)(uint32_t *millis) = &trigger_action;
+//bool triggerHeld() {
+//	return ((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0);
+//}
 
-bool triggerHeld() {
-	return ((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0);
-}
+//bool triggerReleased() {
+//	return (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0));
+//}
 
-bool triggerReleased() {
-	return ((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0);
-}
+//bool checkPullDebounce(uint32_t *millis) {
+//	return (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE);
+//}
 
-void trigger_run(uint32_t *millis) {
-	fireMethod(millis);
-}
+//bool checkReleaseDebounce(uint32_t *millis) {
+//	return (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE);
+//}
 
-bool checkPullDebounce(uint32_t *millis) {
-	return (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE);
-}
-
-bool checkReleaseDebounce(uint32_t *millis) {
-	return (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE);
-}
-
-void trigger_changeMode() {
+//void trigger_changeMode() {
 	// Stop any active firing
-	trigger_pulled = false;
-	
-	/*
-	// 0 - Full Auto
-	// 1 - Burst
-	// 2 - Auto Response
-	if (FIRING_MODE == 0) {        // FULL AUTO
-		fireMethod = &trigger_fullAuto;
-	} else if (FIRING_MODE == 1) { // BURST
-		fireMethod = &trigger_burst;
-	} else if (FIRING_MODE == 2) { // AUTO RESPONSE
-		fireMethod = &trigger_autoResponse;
-	} else {                       // SINGLE SHOT
-		fireMethod = &trigger_singleShot;
-	}
-	*/
-	
-	fireMethod = &trigger_action;
-}
-/*
-void trigger_singleShot(uint32_t *millis) {
+//	trigger_pulled = false;
+//}
 
-	// Trigger Pulled
-	if (!trigger_pulled &&
-		triggerHeld() &&
-		checkReleaseDebounce(millis)) {
-		
-		trigger_pulled = true;
-		trigger_activeTime = (*millis);
-		firing_queue = 1;
-	}
-
-	// Trigger Release
-	if (trigger_pulled == true && triggerReleased() && checkPullDebounce(millis)) {
-
-		trigger_pulled = false;
-		trigger_activeTime = (*millis);
-	}
-
-
-	fireFromQueue(millis);
-}
-
-void trigger_fullAuto(uint32_t *millis) {
-
-	// Trigger Pulled
-	if (!trigger_pulled && 
-		triggerHeld() &&
-		checkReleaseDebounce(millis)) {
-
-		trigger_pulled = true;
-		trigger_activeTime = (*millis);
-		firing_queue = 1;
-	}
-
-	// Trigger Held
-	if (trigger_pulled == true &&
-		triggerHeld() &&
-		checkPullDebounce(millis) &&
-		(((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
-	
-		trigger_activeTime = (*millis);
-		
-		// Don't allow FA if safety shots have not been reached
-		// FA needs to be greater than the safety shot
-		// since holding the trigger would auto-qualify the last safety shot.
-		if (safetyShotsFired > SAFETY_SHOT || SAFETY_SHOT == 0) {
-			firing_queue = 1;
-		}			
-	}
-
-	// Trigger Release
-	if (trigger_pulled && triggerReleased() && checkPullDebounce(millis)) {
-		trigger_pulled = false;
-		trigger_activeTime = (*millis);
-	}
-
-	fireFromQueue(millis);
-}
-
-void trigger_autoResponse(uint32_t *millis) {
-
-	// Trigger Pulled
-	if (!trigger_pulled && 
-		triggerHeld() && 
-		checkReleaseDebounce(millis)) {
-			
-		trigger_pulled = true;
-		trigger_activeTime = (*millis);
-		firing_queue++;
-	}
-
-	// Trigger Release
-	if (trigger_pulled == true && 
-		triggerReleased() && 
-		checkPullDebounce(millis)) {
-
-		// Don't allow auto response if safety shots have not been reached
-		if (safetyShotsFired >= SAFETY_SHOT || SAFETY_SHOT == 0) {
-			firing_queue++;
-		}			
-
-		trigger_pulled = false;
-		trigger_activeTime = (*millis);
-	}
-
-	if (firing_queue > 2) {
-		firing_queue = 2;
-	}
-
-	fireFromQueue(millis);
-}
-
-void trigger_burst(uint32_t *millis) {
-
-	// Trigger Pulled
-	if (!trigger_pulled &&
-		triggerHeld() &&
-		checkPullDebounce(millis)) {
-		
-		trigger_pulled = true;
-		trigger_activeTime = (*millis);
-		
-		// Don't allow burst if safety shots have not been reached
-		if (safetyShotsFired >= SAFETY_SHOT || SAFETY_SHOT == 0) {
-			firing_queue = BURST_SIZE;
-		} else {
-			firing_queue = 1;
-		}
-	}
-
-	// Trigger Release
-	if (trigger_pulled == true &&
-		triggerReleased() &&
-		checkPullDebounce(millis)) {
-		
-		trigger_pulled = false;
-		trigger_activeTime = (*millis);
-	}
-
-	fireFromQueue(millis);
-}
-*/
-void trigger_action(uint32_t *millis) {
+void trigger_run(volatile uint32_t *millis) {
 	
 	//////// TRIGGER PULLED
 	
+	bool pastPullDebounce = (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE);
+
 	// NOTE: Burst originally used checkPullDebounce()
-	if (!trigger_pulled && triggerHeld() &&	checkReleaseDebounce(millis)) {
+	if (!trigger_pulled
+		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0)) // Trigger Held
+		&& (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) { //checkReleaseDebounce(millis)) {
 
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
@@ -235,7 +92,10 @@ void trigger_action(uint32_t *millis) {
 		
 	//////// TRIGGER HELD
 	// Trigger Held
-	if (trigger_pulled && triggerHeld() && checkPullDebounce(millis) && (((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
+	if (trigger_pulled
+		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0)) // Trigger Held
+		&& pastPullDebounce // checkPullDebounce(millis)
+		&& (((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
 		
 		switch (FIRING_MODE) {
 			case 0: // Full Auto
@@ -262,7 +122,10 @@ void trigger_action(uint32_t *millis) {
 	
 	//////// TRIGGER RELEASED
 	// Trigger Release
-	if (trigger_pulled && triggerReleased() && checkPullDebounce(millis)) {
+	if (trigger_pulled
+		&& (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0)) // triggerReleased()
+		&& pastPullDebounce) { //checkPullDebounce(millis)) {
+
 		trigger_pulled = false;
 		trigger_activeTime = (*millis);
 
@@ -288,14 +151,45 @@ void trigger_action(uint32_t *millis) {
 	}
 
 	// FIRE!!!
-	fireFromQueue(millis);	
+	//fireFromQueue(millis);
+
+
+	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
+
+		lastTriggerPullTime = (*millis);
+
+		safetyShotsFired++;
+
+		uint8_t safetyMax = SAFETY_SHOT + 1;
+
+		// This is a safety to prevent integer overflow (adding 1 for FA)
+		if (safetyShotsFired > (safetyMax)) {
+			safetyShotsFired = safetyMax;
+		}
+
+		// decrement the queue
+		firing_queue--;
+
+		// Fire a round
+		solenoid_reset();
+
+		// Reset the trigger active time
+		queue_activeTime = (*millis);
+	}
+
+	// If the ball was fired within a second, increment safety shots fired
+	if ((*millis) - lastTriggerPullTime > 1000) {
+		safetyShotsFired = 0;
+	}
+
+	solenoid_run(millis);
 }
 
 // Semi Auto, set queue to 1
 // Full Auto, while the trigger is pulled, set queue to 1
 // round burst, set queue to BURST_SIZE
 // Auto-response, set queue to 1 on trigger pull and again on release
-
+/*
 void fireFromQueue(uint32_t *millis) {
 	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
 		
@@ -328,3 +222,4 @@ void fireFromQueue(uint32_t *millis) {
 
 	solenoid_run(millis);
 }
+*/

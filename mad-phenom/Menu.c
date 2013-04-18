@@ -64,6 +64,39 @@ void orangeLed() {
 }
 
 void presetMenu() {
+
+#ifdef X7CLASSIC
+/************************************************************************/
+/* This is used for the X7 classic to distinguish between F and FA      */
+/************************************************************************/
+	// SELECTOR
+	currentSelector = 0;
+	menuMax = 1;
+	selectedMenu = NOT_SELECTED;
+	currentMenu = 0;
+
+	while(selectedMenu == NOT_SELECTED) {
+		if (currentMenu == 0) { // Preset 1
+			redOn();
+			delay_ms(100);
+			redOff();
+			delay_ms(800);
+		} else if (currentMenu == 1) { // Preset 2
+			for (uint8_t i = 0; i < 2; i++) {
+				redOn();
+				delay_ms(100);
+				redOff();
+				delay_ms(100);
+			}
+
+			delay_ms(700);
+		}
+	}
+
+	currentSelector = selectedMenu;
+
+	////////
+#endif
 	menuMax = 2;
 	selectedMenu = NOT_SELECTED;
 	currentMenu = 0;
@@ -88,8 +121,12 @@ void presetMenu() {
 			delay_ms(800);
 		}
 	}
-	
+
+#ifdef X7CLASSIC
+	CURRENT_PRESET[currentSelector] = selectedMenu;
+#else
 	CURRENT_PRESET = selectedMenu;
+#endif
 }
 
 void mainMenu() {
@@ -199,7 +236,11 @@ void firingModeMenu() {
 	}
 	
 	if (selectedMenu >= 0 && selectedMenu <= 3) {
+#ifdef X7CLASSIC
+		eeprom_write_byte(&EEPROM_FIRING_MODE[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
+#else
 		eeprom_write_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET], selectedMenu);
+#endif
 		successBlink();
 	} else {
 		failureBlink();
@@ -211,7 +252,11 @@ void ammoLimitMenu() {
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 0 && selectedMenu <= 250) {
+#ifdef X7CLASSIC
+		eeprom_write_byte(&EEPROM_AMMO_LIMIT[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
+#else
 		eeprom_write_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET], selectedMenu);
+#endif
 		AMMO_LIMIT = selectedMenu;
 		successBlink();
 	} else {
@@ -224,7 +269,11 @@ void safetyShotMenu() {
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 0 && selectedMenu <= 250) {
+#ifdef X7CLASSIC
+		eeprom_write_byte(&EEPROM_SAFETY_SHOT[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
+#else
 		eeprom_write_byte(&EEPROM_SAFETY_SHOT[CURRENT_PRESET], selectedMenu);
+#endif
 		SAFETY_SHOT = selectedMenu;
 		successBlink();
 	} else {
@@ -260,7 +309,11 @@ void rateOfFireMenu() {
 	
 	// Firing rate was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 5 && selectedMenu <= 40) {
+#ifdef X7CLASSIC
+		eeprom_write_byte(&EEPROM_BALLS_PER_SECOND[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
+#else
 		eeprom_write_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET], selectedMenu);
+#endif
 		BALLS_PER_SECOND = selectedMenu;
 		successBlink();
 	} else {
@@ -273,7 +326,11 @@ void burstSizeMenu() {
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
 	if (selectedMenu >= 2 && selectedMenu <= 10) {
+#ifdef X7CLASSIC
+		eeprom_write_byte(&EEPROM_BURST_SIZE[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
+#else
 		eeprom_write_byte(&EEPROM_BURST_SIZE[CURRENT_PRESET], selectedMenu);
+#endif
 		BURST_SIZE = selectedMenu;
 		successBlink();
 	} else {

@@ -28,31 +28,50 @@ bool pushbutton_indicatorOn = false;
 void pushbutton_run(volatile uint32_t *millis) {
 	
 	bool pastDebounce = ((*millis) - pushbutton_activeTime) > PULL_DEBOUNCE;
-	
+
 	// Check if the push button was pushed
 	if (!pushbutton_down && pushButtonHasInput() && pastDebounce) {
+
 		pushbutton_down = true;
 		redOn();
-		pushbutton_activeTime    = (*millis);		
+		pushbutton_activeTime = (*millis);
 		greenOff();
 	}
 	
-    // Has the pushbutton been released? ()
-    if (pushbutton_down && !pushButtonHasInput() && pastDebounce) {
-        if (((*millis) - pushbutton_activeTime) > 100) {
-            togglePreset();
+#ifdef X7CLASSIC
+	if (pushbutton_down
+		&& pushButtonHasInput() // Trigger Held
+		&& pastDebounce) {
+
+		// This is used to power down the X7 classic
+		if (((*millis) - pushbutton_activeTime) > 5000) {
+			// Power down
+			//PORTA &= ~(1 << PINA0); // 13 - LOW
+			PORTA &= ~(1 << PINA3); // 10 - LOW
+		}
+	}
+#endif
+
+	// Has the pushbutton been released? ()
+	if (pushbutton_down && !pushButtonHasInput() && pastDebounce) {
+		if (((*millis) - pushbutton_activeTime) > 100) {
+			togglePreset();
 			pushbutton_currentBlink = 0;
 			pushbutton_indicatorOn   = false;
 			pushbutton_indicatorTime = (*millis);
-        }
+		}
 
-        pushbutton_down       = false;
-        pushbutton_activeTime = (*millis);
-        redOff();
-    }
+		pushbutton_down       = false;
+		pushbutton_activeTime = (*millis);
+		redOff();
+	}
 	
 	// This code will turn the green LED on and off to signify which preset is active
+#ifdef X7CLASSIC
+	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 200 && pushbutton_currentBlink < (CURRENT_PRESET[currentSelector] + 1)) {
+#else
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 200 && pushbutton_currentBlink < (CURRENT_PRESET + 1)) {
+#endif
 		if (AMMO_LIMIT > 0 && shotsFired >= AMMO_LIMIT) {
 			redOn();
 		} else {
@@ -69,8 +88,28 @@ void pushbutton_run(volatile uint32_t *millis) {
 		pushbutton_indicatorOn = false;
 		pushbutton_indicatorTime = (*millis);
 	}
-	
+
+#ifdef X7CLASSiC
+	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET[currentSelector] + 1)) {
+#else	
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET + 1)) {
+#endif
 		pushbutton_currentBlink = 0;
 	}
+
+#ifdef X7CLASSIC
+	// Check the selector switch
+	if ((PINB & (1 << PINB0)) <= 0) {
+		if (currentSelector == 0) {
+			currentSelector = 1; // Mode (FA)
+			loadPreset();
+		}
+	} else {
+		if (currentSelector == 1) {
+			currentSelector = 0; // Mode (F)
+			loadPreset();
+		}
+	}
+#endif
+
 }

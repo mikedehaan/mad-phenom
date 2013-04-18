@@ -60,8 +60,12 @@ int main(void) {
 	DDRA &= ~(1 << PINA6); // Pin 7 - Trigger Pin 2
 
 	// Other unknown pins
+	//DDRA |= (1 << PINA0); // Pin 13
 	//PORTA |= (1 << PINA0); // 13 - HIGH
-	//PORTA |= (1 << PINA3); // 10 - HIGH
+#ifdef X7CLASSIC
+	DDRA |= (1 << PINA3); // Pin 10 - Power pin
+	PORTA |= (1 << PINA3); // 10 - HIGH
+#endif
 	//PORTA &= ~(1 << PINA4);	// 9 - LOW
 	//PORTA &= ~(1 << PINA5);	// 8 - LOW
 	
@@ -71,11 +75,17 @@ int main(void) {
 	
 	// Set Pushbutton HIGH
 	PORTB |= (1 << PINB1);
-	
+
+#ifdef X7CLASSIC
+	// Selector switch on pin 2
+	DDRB &= ~(1 << PINB0); // Pin 2
+	PORTB |= (1 << PINB0); // Pin 2 set HIGH
+#endif
+
 	// If the button is held during startup, enter config mode.
 	uint16_t buttonHeldTime = 0;
 	bool configMode = false;
-	while (pushButtonHasInput()) {
+	while ((PINB & (1 << PINB1)) <= 0) {
 		delay_ms(1);
 		
 		buttonHeldTime++;
@@ -105,12 +115,26 @@ int main(void) {
 }
 
 ISR(PCINT1_vect) {
-	if (!triggerPulled && triggerHeld()) {
+	uint16_t buttonHeldTime = 0;
+
+	while ((PINB & (1 << PINB1)) <= 0) {
+		delay_ms(1);
+
+		buttonHeldTime++;
+		if (buttonHeldTime > 5000) {
+			// Power down
+			PORTA &= ~(1 << PINA3);
+		}
+	}
+
+	buttonHeldTime = 0;
+
+	if (!triggerPulled
+		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0))) { // Trigger Held
 		triggerPulled = true;
 
-		uint16_t buttonHeldTime = 0;
 		delay_ms(PULL_DEBOUNCE);
-		while (triggerHeld()) {
+		while ((((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0))) { // Trigger Held
 			delay_ms(1);
 			buttonHeldTime += 1;
 			
@@ -121,7 +145,8 @@ ISR(PCINT1_vect) {
 		configTriggerPulled(buttonHeldTime);
 	}
 
-	if (triggerPulled && triggerReleased()) {		
+	if (triggerPulled
+	    && (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0))) { // && triggerReleased()) {
 		delay_ms(RELEASE_DEBOUNCE);
 		triggerPulled = false;
 	}

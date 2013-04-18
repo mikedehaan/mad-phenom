@@ -6,13 +6,19 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
+		PHENOM|AVR = PHENOM|AVR
 		Release|AVR = Release|AVR
+		X7CLASSIC|AVR = X7CLASSIC|AVR
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Debug|AVR.ActiveCfg = Debug|AVR
 		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Debug|AVR.Build.0 = Debug|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.PHENOM|AVR.ActiveCfg = PHENOM|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.PHENOM|AVR.Build.0 = PHENOM|AVR
 		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Release|AVR.ActiveCfg = Release|AVR
 		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.Release|AVR.Build.0 = Release|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.X7CLASSIC|AVR.ActiveCfg = X7CLASSIC|AVR
+		{48BEB32D-6183-42B3-8AC8-EC6E370F380A}.X7CLASSIC|AVR.Build.0 = X7CLASSIC|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

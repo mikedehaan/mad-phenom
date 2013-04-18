@@ -21,8 +21,10 @@ along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdbool.h>
 
 void trigger_run(volatile uint32_t *millisecond);
-void trigger_changeMode();
+//void trigger_changeMode();
 bool triggerHeld();
 bool triggerReleased();
+
+extern bool trigger_pulled;
 
 #endif /* TRIGGER_H_ */

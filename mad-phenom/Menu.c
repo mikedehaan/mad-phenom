@@ -268,7 +268,7 @@ void safetyShotMenu() {
 	getNumberFromUser(SAFETY_SHOT, 5);
 	
 	// Burst size was entered into selectedMenu.  Verify it and save it.
-	if (selectedMenu >= 0 && selectedMenu <= 250) {
+	if (selectedMenu >= 0 && selectedMenu <= 5) {
 #ifdef X7CLASSIC
 		eeprom_write_byte(&EEPROM_SAFETY_SHOT[currentSelector][CURRENT_PRESET[currentSelector]], selectedMenu);
 #else
@@ -403,14 +403,21 @@ void advancedConfig() {
 		while(selectedMenu == NOT_SELECTED) {
 			if (currentMenu == 0) { // DWELL
 				greenOn();
-				delay_ms(100);
+				delay_ms(50);
 				greenOff();
+				redOn();
+				delay_ms(50);
+				redOff();
+				
 				delay_ms(800);
 			} else if (currentMenu == 1) { // DEBOUNCE 2
 				for (uint8_t i = 0; i < 2; i++) {
 					greenOn();
-					delay_ms(100);
+					delay_ms(50);
 					greenOff();
+					redOn();
+					delay_ms(50);
+					redOff();
 					delay_ms(100);
 				}
 
@@ -418,11 +425,12 @@ void advancedConfig() {
 			}
 		}
 	
-		if (selectedMenu == 0) {
-			getNumberFromUser(USER_DWELL, 20);
+		if (selectedMenu == 0) { // DWELL
+			// Max is set high to prevent wrapping around to 0 without the user knowing
+			getNumberFromUser(USER_DWELL, 255);
 	
-			// Burst size was entered into selectedMenu.  Verify it and save it.
-			if (selectedMenu >= 0 && selectedMenu <= 250) {
+			// Dwell was entered into selectedMenu.  Verify it and save it.
+			if (selectedMenu >= 2 && selectedMenu <= 20) {
 				eeprom_write_byte(&EEPROM_USER_DWELL, selectedMenu);
 				USER_DWELL = selectedMenu;
 				successBlink();
@@ -430,10 +438,11 @@ void advancedConfig() {
 				failureBlink();
 			}
 		} else { // DEBOUNCE
-			getNumberFromUser(USER_DEBOUNCE, 50);
+			// Max is set high to prevent wrapping around to 0 without the user knowing
+			getNumberFromUser(USER_DEBOUNCE, 255);
 		
-			// Burst size was entered into selectedMenu.  Verify it and save it.
-			if (selectedMenu >= 0 && selectedMenu <= 250) {
+			// Debounce was entered into selectedMenu.  Verify it and save it.
+			if (selectedMenu >= 5 && selectedMenu <= 50) {
 				eeprom_write_byte(&EEPROM_USER_DEBOUNCE, selectedMenu);
 				USER_DWELL = selectedMenu;
 				successBlink();

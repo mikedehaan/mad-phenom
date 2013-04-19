@@ -88,15 +88,23 @@ int main(void) {
 	while ((PINB & (1 << PINB1)) <= 0) {
 		delay_ms(1);
 		
+		// Prevent overflow
 		buttonHeldTime++;
-		if (buttonHeldTime > 3000) {
-			buttonHeldTime = 3000;
+		if (buttonHeldTime > 20000) {
+			buttonHeldTime = 20000;
 		}
 	}
 	
 	if (buttonHeldTime >= 1000) {
 		configMode = true;
 	}
+
+#ifdef DWELL_DEBOUNCE
+    bool advancedMenu = 0;
+	if (buttonHeldTime >= 10000) {
+		advancedMenu = 1;
+	}
+#endif
 	
 	if (configMode) {
 		// Initialize interrupts for the menu system
@@ -104,7 +112,15 @@ int main(void) {
 		PCMSK1 |= (1 << PCINT9);  // Enable interrupts for the push button
 		GIMSK = (1 << PCIE1);    //Enable interrupts period for PCI0 (PCINT11:8
 		
-		handleConfig();	
+#ifdef DWELL_DEBOUNCE
+		if (advancedMenu) {
+			advancedConfig();
+		} else {
+			handleConfig();
+		}		
+#else
+		handleConfig();
+#endif				
 	} else { // Normal run mode
 		for (;;) {
 			// This prevents time from changing within an iteration

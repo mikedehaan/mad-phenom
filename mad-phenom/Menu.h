@@ -18,6 +18,11 @@ along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
 #define MENU_H_
 
 void handleConfig();
+
+#ifdef DWELL_DEBOUNCE
+void advancedConfig();
+#endif
+
 void successBlink();
 void failureBlink();
 void configTriggerPulled(uint32_t buttonHeldTime);

@@ -66,13 +66,32 @@ void loadPreset() {
 	if (SAFETY_SHOT < 0 || SAFETY_SHOT > 5) {
 		SAFETY_SHOT = 0;
 	}
-	
+
+#ifdef DWELL_DEBOUNCE
+
+	USER_DWELL = eeprom_read_byte(&EEPROM_USER_DWELL);
+	USER_DEBOUNCE = eeprom_read_byte(&EEPROM_USER_DEBOUNCE);
+
+	if (USER_DWELL < 2 || USER_DWELL > 20) {
+		USER_DWELL = 8;
+	}
+
+	if (USER_DEBOUNCE < 5 || USER_DEBOUNCE > 50) {
+		USER_DEBOUNCE = 20;
+	}
+
+	RELEASE_DEBOUNCE = USER_DEBOUNCE;
+	DWELL = USER_DWELL;
+
+#else
 	DWELL = 8;
-	
+
 	// Cutting this in down since I think the tippmann default is for trigger pull and release.
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
+#endif
+
 	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
-	
+
 	// Default to full auto
 	// 0 = full auto
 	// 1 = three round burst

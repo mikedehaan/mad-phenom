@@ -88,4 +88,12 @@ uint8_t ROUND_DELAY; // delay between shots in ms
 uint8_t RELEASE_DEBOUNCE;  // Debounce in ms
 uint8_t DWELL;
 
+#ifdef DWELL_DEBOUNCE
+uint8_t EEMEM EEPROM_USER_DWELL;
+uint8_t EEMEM EEPROM_USER_DEBOUNCE;
+
+uint8_t USER_DWELL;
+uint8_t USER_DEBOUNCE;
+#endif
+
 uint8_t shotsFired;

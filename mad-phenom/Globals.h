@@ -92,6 +92,14 @@ extern uint8_t EEPROM_AMMO_LIMIT[];
 extern uint8_t EEPROM_SAFETY_SHOT[];
 #endif
 
+#ifdef DWELL_DEBOUNCE
+extern uint8_t EEMEM EEPROM_USER_DWELL;
+extern uint8_t EEMEM EEPROM_USER_DEBOUNCE;
+
+extern uint8_t USER_DWELL;
+extern uint8_t USER_DEBOUNCE;
+#endif
+
 extern uint8_t BALLS_PER_SECOND;
 extern uint8_t FIRING_MODE;
 extern uint8_t BURST_SIZE;

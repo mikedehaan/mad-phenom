@@ -58,7 +58,7 @@ void trigger_run(volatile uint32_t *millis) {
 	
 	//////// TRIGGER PULLED
 	
-	bool pastPullDebounce = (((*millis) - trigger_activeTime) >= PULL_DEBOUNCE);
+	bool pastPullDebounce = (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE);
 
 	// NOTE: Burst originally used checkPullDebounce()
 	if (!trigger_pulled

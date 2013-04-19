@@ -391,6 +391,60 @@ void handleConfig() {
 	}			
 }
 
+#ifdef DWELL_DEBOUNCE
+void advancedConfig() {
+	
+	while(1) {
+	
+		menuMax = 1;
+		selectedMenu = NOT_SELECTED;
+		currentMenu = 0;
+
+		while(selectedMenu == NOT_SELECTED) {
+			if (currentMenu == 0) { // DWELL
+				greenOn();
+				delay_ms(100);
+				greenOff();
+				delay_ms(800);
+			} else if (currentMenu == 1) { // DEBOUNCE 2
+				for (uint8_t i = 0; i < 2; i++) {
+					greenOn();
+					delay_ms(100);
+					greenOff();
+					delay_ms(100);
+				}
+
+				delay_ms(700);
+			}
+		}
+	
+		if (selectedMenu == 0) {
+			getNumberFromUser(USER_DWELL, 20);
+	
+			// Burst size was entered into selectedMenu.  Verify it and save it.
+			if (selectedMenu >= 0 && selectedMenu <= 250) {
+				eeprom_write_byte(&EEPROM_USER_DWELL, selectedMenu);
+				USER_DWELL = selectedMenu;
+				successBlink();
+			} else {
+				failureBlink();
+			}
+		} else { // DEBOUNCE
+			getNumberFromUser(USER_DEBOUNCE, 50);
+		
+			// Burst size was entered into selectedMenu.  Verify it and save it.
+			if (selectedMenu >= 0 && selectedMenu <= 250) {
+				eeprom_write_byte(&EEPROM_USER_DEBOUNCE, selectedMenu);
+				USER_DWELL = selectedMenu;
+				successBlink();
+			} else {
+				failureBlink();
+			}
+		}	
+	}			
+}
+#endif
+
 /************************************************************************/
 /* buttonHeldTime - The time in ms that the trigger was held for        */
 /************************************************************************/

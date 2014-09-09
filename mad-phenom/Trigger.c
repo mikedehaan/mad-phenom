@@ -34,11 +34,11 @@ uint8_t firing_queue = 0;
 //void fireFromQueue(uint32_t *millis);
 
 //bool triggerHeld() {
-//	return ((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0);
+//	return (triggerSensor2() <= 0) || (triggerSensor1() <= 0);
 //}
 
 //bool triggerReleased() {
-//	return (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0));
+//	return ((triggerSensor2() > 0) && (triggerSensor1() > 0));
 //}
 
 //bool checkPullDebounce(uint32_t *millis) {
@@ -62,7 +62,7 @@ void trigger_run(volatile uint32_t *millis) {
 
 	// NOTE: Burst originally used checkPullDebounce()
 	if (!trigger_pulled
-		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0)) // Trigger Held
+		&& macHold() // Trigger Held
 		&& (((*millis) - trigger_activeTime) >= RELEASE_DEBOUNCE)) { //checkReleaseDebounce(millis)) {
 
 		trigger_pulled = true;
@@ -93,7 +93,7 @@ void trigger_run(volatile uint32_t *millis) {
 	//////// TRIGGER HELD
 	// Trigger Held
 	if (trigger_pulled
-		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0)) // Trigger Held
+		&& macHold() // Trigger Held
 		&& pastPullDebounce // checkPullDebounce(millis)
 		&& (((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
 		
@@ -123,7 +123,7 @@ void trigger_run(volatile uint32_t *millis) {
 	//////// TRIGGER RELEASED
 	// Trigger Release
 	if (trigger_pulled
-		&& (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0)) // triggerReleased()
+		&& macRelease() // triggerReleased()
 		&& pastPullDebounce) { //checkPullDebounce(millis)) {
 
 		trigger_pulled = false;

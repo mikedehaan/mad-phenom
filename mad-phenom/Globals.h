@@ -31,7 +31,18 @@ along with mad-phenom.  If not, see <http://www.gnu.org/licenses/>.
 
 #define PULL_DEBOUNCE 20
 
+#define triggerSensor1() (PINA & (1 << PINA6))
+#define triggerSensor2() (PINB & (1 << PINB2))
+#define macHold()    ((triggerSensor2() <= 0) || (triggerSensor1() <= 0))
+#define macRelease() ((triggerSensor2() >  0) && (triggerSensor1() >  0))
 
+// Sensor 1
+//#define macHold()    (triggerSensor1() <= 0)
+//#define macRelease() (triggerSensor1() >  0)
+
+// Sensor 2
+//#define macHold()    (triggerSensor2() <= 0)
+//#define macRelease() (triggerSensor2() >  0)
 
 extern uint8_t EEMEM EEPROM_BALLS_PER_SECOND_1;
 extern uint8_t EEMEM EEPROM_FIRING_MODE_1;

@@ -148,11 +148,11 @@ ISR(PCINT1_vect) {
 	buttonHeldTime = 0;
 
 	if (!triggerPulled
-		&& (((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0))) { // Trigger Held
+		&& macHold()) { // Trigger Held
 		triggerPulled = true;
 
 		delay_ms(PULL_DEBOUNCE);
-		while ((((PINB & (1 << PINB2)) <= 0) || ((PINA & (1 << PINA6)) <= 0))) { // Trigger Held
+		while (macHold()) { // Trigger Held
 			delay_ms(1);
 			buttonHeldTime += 1;
 			
@@ -164,7 +164,7 @@ ISR(PCINT1_vect) {
 	}
 
 	if (triggerPulled
-	    && (((PINB & (1 << PINB2)) > 0) && ((PINA & (1 << PINA6)) > 0))) { // && triggerReleased()) {
+	    && macRelease()) { // && triggerReleased()) {
 		delay_ms(RELEASE_DEBOUNCE);
 		triggerPulled = false;
 	}

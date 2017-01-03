@@ -82,6 +82,12 @@ int main(void) {
 	PORTB |= (1 << PINB0); // Pin 2 set HIGH
 #endif
 
+	// If the trigger is held, don't do anything until it's release
+	while (macHold()) {
+		// Show the Red LED as solid
+		redOn();
+	}
+
 	// If the button is held during startup, enter config mode.
 	uint16_t buttonHeldTime = 0;
 	bool configMode = false;

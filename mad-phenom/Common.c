@@ -90,7 +90,7 @@ void loadPreset() {
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
 #endif
 
-	ROUND_DELAY = (1000 - DWELL) / BALLS_PER_SECOND;
+	ROUND_DELAY = (1000 / BALLS_PER_SECOND) - DWELL;
 
 	// Default to full auto
 	// 0 = full auto

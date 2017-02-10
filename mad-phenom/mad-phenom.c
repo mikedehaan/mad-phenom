@@ -82,96 +82,20 @@ int main(void) {
 	PORTB |= (1 << PINB0); // Pin 2 set HIGH
 #endif
 
-	// If the trigger is held, don't do anything until it's release
-	while (macHold()) {
-		// Show the Red LED as solid
-		redOn();
-	}
-
-	// If the button is held during startup, enter config mode.
-	uint16_t buttonHeldTime = 0;
-	bool configMode = false;
-	while ((PINB & (1 << PINB1)) <= 0) {
-		delay_ms(1);
-		
-		// Prevent overflow
-		buttonHeldTime++;
-		if (buttonHeldTime > 20000) {
-			buttonHeldTime = 20000;
-		}
-	}
-	
-	if (buttonHeldTime >= 1000) {
-		configMode = true;
-	}
-
-#ifdef DWELL_DEBOUNCE
-    bool advancedMenu = 0;
-	if (buttonHeldTime >= 10000) {
-		advancedMenu = 1;
-	}
-#endif
-	
-	if (configMode) {
-		// Initialize interrupts for the menu system
-		PCMSK1 |= (1 << PCINT10);  //Enable interrupts on PCINT10 (trigger)
-		PCMSK1 |= (1 << PCINT9);  // Enable interrupts for the push button
-		GIMSK = (1 << PCIE1);    //Enable interrupts period for PCI0 (PCINT11:8
-		
-#ifdef DWELL_DEBOUNCE
-		if (advancedMenu) {
-			advancedConfig();
+	while (true) {
+		// Check the selector switch
+		if ((PINB & (1 << PINB0)) <= 0) {
+			if (currentSelector != 1) { // Mode was "F", switching to "FA"
+				currentSelector = 1; // Mode (FA - Red)
+				greenOff();
+				redOn();
+			}
 		} else {
-			handleConfig();
-		}		
-#else
-		handleConfig();
-#endif				
-	} else { // Normal run mode
-		for (;;) {
-			// This prevents time from changing within an iteration
-			trigger_run(&millis);
-			pushbutton_run(&millis);
-		}
-	}		
-}
-
-ISR(PCINT1_vect) {
-	uint16_t buttonHeldTime = 0;
-
-	#ifdef X7CLASSIC
-	while ((PINB & (1 << PINB1)) <= 0) {
-		delay_ms(1);
-
-		buttonHeldTime++;
-		if (buttonHeldTime > 5000) {
-			// Power down
-			PORTA &= ~(1 << PINA3);
-		}
-	}
-#endif
-
-	buttonHeldTime = 0;
-
-	if (!triggerPulled
-		&& macHold()) { // Trigger Held
-		triggerPulled = true;
-
-		delay_ms(PULL_DEBOUNCE);
-		while (macHold()) { // Trigger Held
-			delay_ms(1);
-			buttonHeldTime += 1;
-			
-			if (buttonHeldTime > 3000) {
-				buttonHeldTime = 3000;
+			if (currentSelector != 0) { // Mode was "FA", switching to "F"
+				currentSelector = 0; // Mode (F - Green)
+				redOff();
+				greenOn();
 			}
 		}
-		configTriggerPulled(buttonHeldTime);
-	}
-
-	if (triggerPulled
-	    && macRelease()) { // && triggerReleased()) {
-		delay_ms(RELEASE_DEBOUNCE);
-		triggerPulled = false;
 	}
 }

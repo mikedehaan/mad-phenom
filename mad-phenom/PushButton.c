@@ -89,7 +89,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 		pushbutton_indicatorTime = (*millis);
 	}
 
-#ifdef X7CLASSiC
+#ifdef X7CLASSIC
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET[currentSelector] + 1)) {
 #else	
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET + 1)) {

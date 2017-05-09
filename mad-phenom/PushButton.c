@@ -100,12 +100,12 @@ void pushbutton_run(volatile uint32_t *millis) {
 #ifdef X7CLASSIC
 	// Check the selector switch
 	if ((PINB & (1 << PINB0)) <= 0) {
-		if (currentSelector == 0) {
+		if (currentSelector != 1) { // Mode was "F", switching to "FA"
 			currentSelector = 1; // Mode (FA)
 			loadPreset();
 		}
 	} else {
-		if (currentSelector == 1) {
+		if (currentSelector != 0) { // Mode was "FA", switching to "F"
 			currentSelector = 0; // Mode (F)
 			loadPreset();
 		}

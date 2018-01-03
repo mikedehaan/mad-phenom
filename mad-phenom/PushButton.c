@@ -40,7 +40,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 	
 #ifdef X7CLASSIC
 	if (pushbutton_down
-		&& pushButtonHasInput() // Trigger Held
+		&& pushButtonHasInput() // Button Held
 		&& pastDebounce) {
 
 		// This is used to power down the X7 classic
@@ -48,6 +48,9 @@ void pushbutton_run(volatile uint32_t *millis) {
 			// Power down
 			//PORTA &= ~(1 << PINA0); // 13 - LOW
 			PORTA &= ~(1 << PINA3); // 10 - LOW
+			
+			// The board should be off by now. Exit routine.
+			return;
 		}
 	}
 #endif

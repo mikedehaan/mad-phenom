@@ -106,7 +106,10 @@ void loadPreset() {
 	}
 
 	// Activate the new FIRING_MODE
-	trigger_pulled = false;
+	// This was causing serious issues with X7CLASSIC and the F/FA switch
+	// Basically, "F" was always firing as if it were full-auto
+	// The F/FA switch constantly toggles between F/FA when set to "F" (sub-microsecond fast)
+	//trigger_pulled = false;
 }
 
 void initialize() {

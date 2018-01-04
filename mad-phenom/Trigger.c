@@ -68,7 +68,7 @@ void trigger_run(volatile uint32_t *millis) {
 		trigger_pulled = true;
 		trigger_activeTime = (*millis);
 		trigger_heldTime = (*millis);  // How long the trigger was held for
-		
+
 		switch (FIRING_MODE) {
 			case 0: // Full Auto
 				firing_queue = 1;
@@ -88,6 +88,13 @@ void trigger_run(volatile uint32_t *millis) {
 				firing_queue = 1;			
 				break;
 		}
+
+#ifdef X7CLASSIC
+		if (currentSelector == 0) {
+			firing_queue = 1;
+			//delay_ms(5000);
+		}
+#endif
 	}
 		
 	//////// TRIGGER HELD
@@ -96,28 +103,35 @@ void trigger_run(volatile uint32_t *millis) {
 		&& macHold() // Trigger Held
 		&& pastPullDebounce // checkPullDebounce(millis)
 		&& (((*millis) - trigger_activeTime) >= ROUND_DELAY)) {
+
+#ifdef X7CLASSIC
+		if (currentSelector == 1) {
+#endif
+			switch (FIRING_MODE) {
+				case 0: // Full Auto
+					trigger_activeTime = (*millis);
 		
-		switch (FIRING_MODE) {
-			case 0: // Full Auto
-				trigger_activeTime = (*millis);
-		
-				// Don't allow FA if safety shots have not been reached
-				// FA needs to be greater than the safety shot
-				// since holding the trigger would auto-qualify the last safety shot.
-				if (safetyShotsFired > SAFETY_SHOT || SAFETY_SHOT == 0) {
-					firing_queue = 1;
-				}
-				break;
-			case 1:
-				// Nothing while trigger is held
-				break;
-			case 2:
-				// Nothing while trigger is held
-				break;
-			default:
-				// Nothing while trigger is held
-				break;
+					// Don't allow FA if safety shots have not been reached
+					// FA needs to be greater than the safety shot
+					// since holding the trigger would auto-qualify the last safety shot.
+					if (safetyShotsFired > SAFETY_SHOT || SAFETY_SHOT == 0) {
+						firing_queue = 1;
+					}
+					break;
+				case 1:
+					// Nothing while trigger is held
+					break;
+				case 2:
+					// Nothing while trigger is held
+					break;
+				case 3:
+					// Nothing while trigger is held
+					break;
+			}
+#ifdef X7CLASSIC
 		}
+#endif
+		
 	}
 	
 	//////// TRIGGER RELEASED
@@ -129,31 +143,36 @@ void trigger_run(volatile uint32_t *millis) {
 		trigger_pulled = false;
 		trigger_activeTime = (*millis);
 
-		// Fire a round if Auto response
-		if (FIRING_MODE == 2) {
+#ifdef X7CLASSIC
+		if (currentSelector == 1) {
+#endif
+	
+			// Fire a round if Auto response
+			if (FIRING_MODE == 2) {
 
-			// If the trigger was held for 2 seconds or more, don't fire a round
-			if (((*millis) - trigger_heldTime) < 2000) {
+				// If the trigger was held for 2 seconds or more, don't fire a round
+				if (((*millis) - trigger_heldTime) < 2000) {
 
-				// Don't allow auto response if safety shots have not been reached
-				if (safetyShotsFired >= SAFETY_SHOT || SAFETY_SHOT == 0) {
-					firing_queue++;
+					// Don't allow auto response if safety shots have not been reached
+					if (safetyShotsFired >= SAFETY_SHOT || SAFETY_SHOT == 0) {
+						firing_queue++;
+					}
 				}
 			}
-		}
 
-		// If AMMO LIMIT is enabled and the trigger is held down for more than 2 seconds, reset the ammo limit
-		// For now, I'm leaving this enabled for full-auto as well (we'll see how the user feedback goes).
-		if (AMMO_LIMIT > 0 && shotsFired >= AMMO_LIMIT && ((*millis) - trigger_heldTime) >= 2000) {
-			// Reset the ammo limit
-			shotsFired = 0;
+			// If AMMO LIMIT is enabled and the trigger is held down for more than 2 seconds, reset the ammo limit
+			// For now, I'm leaving this enabled for full-auto as well (we'll see how the user feedback goes).
+			if (AMMO_LIMIT > 0 && shotsFired >= AMMO_LIMIT && ((*millis) - trigger_heldTime) >= 2000) {
+				// Reset the ammo limit
+				shotsFired = 0;
+			}
+
+#ifdef X7CLASSIC
 		}
+#endif	
 	}
 
 	// FIRE!!!
-	//fireFromQueue(millis);
-
-
 	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
 
 		lastTriggerPullTime = (*millis);
@@ -184,42 +203,3 @@ void trigger_run(volatile uint32_t *millis) {
 
 	solenoid_run(millis);
 }
-
-// Semi Auto, set queue to 1
-// Full Auto, while the trigger is pulled, set queue to 1
-// round burst, set queue to BURST_SIZE
-// Auto-response, set queue to 1 on trigger pull and again on release
-/*
-void fireFromQueue(uint32_t *millis) {
-	if (firing_queue > 0 && ((*millis) - queue_activeTime >= ROUND_DELAY)) {
-		
-		lastTriggerPullTime = (*millis);
-
-		safetyShotsFired++;
-
-		uint8_t safetyMax = SAFETY_SHOT + 1;
-
-		// This is a safety to prevent integer overflow (adding 1 for FA)
-		if (safetyShotsFired > (safetyMax)) {
-			safetyShotsFired = safetyMax;
-		}
-
-		// decrement the queue
-		firing_queue--;
-
-		// Fire a round
-		solenoid_reset();
-
-		// Reset the trigger active time
-		queue_activeTime = (*millis);
-		
-	}
-
-	// If the ball was fired within a second, increment safety shots fired
-	if ((*millis) - lastTriggerPullTime > 1000) {
-		safetyShotsFired = 0;
-	}
-
-	solenoid_run(millis);
-}
-*/

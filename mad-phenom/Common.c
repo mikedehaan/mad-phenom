@@ -36,19 +36,12 @@ void delay_ms(uint16_t ms){
 
 void loadPreset() {
 
-#ifdef X7CLASSIC
-	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[currentSelector][CURRENT_PRESET[currentSelector]]);
-	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[currentSelector][CURRENT_PRESET[currentSelector]]);
-	BURST_SIZE = eeprom_read_byte(&EEPROM_BURST_SIZE[currentSelector][CURRENT_PRESET[currentSelector]]);
-	AMMO_LIMIT = eeprom_read_byte(&EEPROM_AMMO_LIMIT[currentSelector][CURRENT_PRESET[currentSelector]]);
-	SAFETY_SHOT = eeprom_read_byte(&EEPROM_SAFETY_SHOT[currentSelector][CURRENT_PRESET[currentSelector]]);
-#else
 	BALLS_PER_SECOND = eeprom_read_byte(&EEPROM_BALLS_PER_SECOND[CURRENT_PRESET]);
 	FIRING_MODE = eeprom_read_byte(&EEPROM_FIRING_MODE[CURRENT_PRESET]);
 	BURST_SIZE = eeprom_read_byte(&EEPROM_BURST_SIZE[CURRENT_PRESET]);
 	AMMO_LIMIT = eeprom_read_byte(&EEPROM_AMMO_LIMIT[CURRENT_PRESET]);
 	SAFETY_SHOT = eeprom_read_byte(&EEPROM_SAFETY_SHOT[CURRENT_PRESET]);
-#endif
+
 	// If the data is invalid, use default values
 	if (BALLS_PER_SECOND < 5 || BALLS_PER_SECOND > 40) {
 		BALLS_PER_SECOND = 20;
@@ -90,6 +83,17 @@ void loadPreset() {
 	RELEASE_DEBOUNCE = 20; //Tippmann default - 52;
 #endif
 
+#ifdef X7CLASSIC
+	// If the selector switch is on "F" force semi-auto
+	if (currentSelector == 0) {
+		BALLS_PER_SECOND = 20;
+		FIRING_MODE = 3;
+		BURST_SIZE = 1;
+		AMMO_LIMIT = 0;
+		SAFETY_SHOT = 0;
+	}
+#endif
+
 	ROUND_DELAY = (1000 / BALLS_PER_SECOND) - DWELL;
 
 	// Default to full auto
@@ -105,67 +109,6 @@ void loadPreset() {
 	trigger_pulled = false;
 }
 
-#ifdef X7CLASSIC
-void initialize() {
-	EEPROM_BALLS_PER_SECOND[0][0] = EEPROM_BALLS_PER_SECOND_1;
-	EEPROM_FIRING_MODE[0][0] = EEPROM_FIRING_MODE_1;
-	EEPROM_BURST_SIZE[0][0] = EEPROM_BURST_SIZE_1;
-	EEPROM_AMMO_LIMIT[0][0] = EEPROM_AMMO_LIMIT_1;
-
-	EEPROM_BALLS_PER_SECOND[0][1] = EEPROM_BALLS_PER_SECOND_2;
-	EEPROM_FIRING_MODE[0][1] = EEPROM_FIRING_MODE_2;
-	EEPROM_BURST_SIZE[0][1] = EEPROM_BURST_SIZE_2;
-	EEPROM_AMMO_LIMIT[0][1] = EEPROM_AMMO_LIMIT_2;
-
-	EEPROM_BALLS_PER_SECOND[0][2] = EEPROM_BALLS_PER_SECOND_3;
-	EEPROM_FIRING_MODE[0][2] = EEPROM_FIRING_MODE_3;
-	EEPROM_BURST_SIZE[0][2] = EEPROM_BURST_SIZE_3;
-	EEPROM_AMMO_LIMIT[0][2] = EEPROM_AMMO_LIMIT_3;
-
-	EEPROM_BALLS_PER_SECOND[1][0] = EEPROM_BALLS_PER_SECOND_1;
-	EEPROM_FIRING_MODE[1][0] = EEPROM_FIRING_MODE_1;
-	EEPROM_BURST_SIZE[1][0] = EEPROM_BURST_SIZE_1;
-	EEPROM_AMMO_LIMIT[1][0] = EEPROM_AMMO_LIMIT_1;
-
-	EEPROM_BALLS_PER_SECOND[1][1] = EEPROM_BALLS_PER_SECOND_2;
-	EEPROM_FIRING_MODE[1][1] = EEPROM_FIRING_MODE_2;
-	EEPROM_BURST_SIZE[1][1] = EEPROM_BURST_SIZE_2;
-	EEPROM_AMMO_LIMIT[1][1] = EEPROM_AMMO_LIMIT_2;
-
-	EEPROM_BALLS_PER_SECOND[1][2] = EEPROM_BALLS_PER_SECOND_3;
-	EEPROM_FIRING_MODE[1][2] = EEPROM_FIRING_MODE_3;
-	EEPROM_BURST_SIZE[1][2] = EEPROM_BURST_SIZE_3;
-	EEPROM_AMMO_LIMIT[1][2] = EEPROM_AMMO_LIMIT_3;
-
-	CURRENT_PRESET[0] = eeprom_read_byte(&EEPROM_PRESET_1);
-	if (CURRENT_PRESET[0] < 0 || CURRENT_PRESET[0] > (MAX_PRESETS - 1)) {
-		CURRENT_PRESET[0] = 0;
-	}
-
-	CURRENT_PRESET[1] = eeprom_read_byte(&EEPROM_PRESET_2);
-	if (CURRENT_PRESET[1] < 0 || CURRENT_PRESET[1] > (MAX_PRESETS - 1)) {
-		CURRENT_PRESET[1] = 0;
-	}
-
-	loadPreset();
-}
-
-void togglePreset(){
-	if (CURRENT_PRESET[currentSelector] >= (MAX_PRESETS - 1)) {
-		CURRENT_PRESET[currentSelector] = 0;
-	} else {
-		CURRENT_PRESET[currentSelector]++;
-	}
-	
-	if (currentSelector == 0) {
-		eeprom_write_byte(&EEPROM_PRESET_1, CURRENT_PRESET[0]);
-	} else {
-		eeprom_write_byte(&EEPROM_PRESET_2, CURRENT_PRESET[1]);
-	}
-	
-	loadPreset();
-}
-#else
 void initialize() {
 	EEPROM_BALLS_PER_SECOND[0] = EEPROM_BALLS_PER_SECOND_1;
 	EEPROM_FIRING_MODE[0] = EEPROM_FIRING_MODE_1;
@@ -201,8 +144,6 @@ void togglePreset(){
 	
 	loadPreset();
 }
-
-#endif
 
 void redOff() {
 	PORTA &= ~(1 << PINA1); // RED

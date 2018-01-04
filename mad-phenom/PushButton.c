@@ -70,11 +70,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 	}
 	
 	// This code will turn the green LED on and off to signify which preset is active
-#ifdef X7CLASSIC
-	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 200 && pushbutton_currentBlink < (CURRENT_PRESET[currentSelector] + 1)) {
-#else
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 200 && pushbutton_currentBlink < (CURRENT_PRESET + 1)) {
-#endif
 		if (AMMO_LIMIT > 0 && shotsFired >= AMMO_LIMIT) {
 			redOn();
 		} else {
@@ -92,11 +88,7 @@ void pushbutton_run(volatile uint32_t *millis) {
 		pushbutton_indicatorTime = (*millis);
 	}
 
-#ifdef X7CLASSIC
-	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET[currentSelector] + 1)) {
-#else	
 	if (!pushbutton_indicatorOn && ((*millis) - pushbutton_indicatorTime) > 1000 && pushbutton_currentBlink >= (CURRENT_PRESET + 1)) {
-#endif
 		pushbutton_currentBlink = 0;
 	}
 

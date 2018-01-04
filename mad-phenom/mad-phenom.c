@@ -139,7 +139,7 @@ int main(void) {
 ISR(PCINT1_vect) {
 	uint16_t buttonHeldTime = 0;
 
-	#ifdef X7CLASSIC
+#ifdef X7CLASSIC
 	while ((PINB & (1 << PINB1)) <= 0) {
 		delay_ms(1);
 
